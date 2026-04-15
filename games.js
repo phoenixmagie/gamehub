@@ -27,8 +27,15 @@ const GAMES_DATA = [
         game_name: "Snake",
         icon: "pictures/icons/snake.png", // Pfad zu deinem Icon
         path: "games/snake/index.html",     // Pfad zu deiner Snake-index.html
-        btn_color: "#e60000"
+        btn_color: "#FFDE21"
     },
+{
+    id: "flappy-bird",
+    game_name: "Flappy Bird",
+    path: "games/flappy-bird/index.html",
+    icon: "pictures/icons/flappy-bird.png", // Bildpfad anpassen
+    btn_color: "#9b59b6" // Lila
+},
 
 
     /*{
