@@ -7,66 +7,85 @@
     --choco-chip: #3d2b1f;
 }
 
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Roboto, sans-serif;
     background: var(--dark-bg);
     color: white;
     height: 100vh;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-.game-container { display: flex; height: 100%; }
+/* Layout-Container */
+.game-container {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    overflow: hidden; /* Verhindert doppeltes Scrollen am PC */
+}
 
-/* Sektionen */
+/* --- LINKE SEITE: KLICK-BEREICH --- */
 .click-section {
     flex: 1.5;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-right: 2px solid #333;
+    padding: 20px;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%);
 }
 
-.shop-section {
-    flex: 1;
-    background: var(--card-bg);
-    padding: 20px;
-    overflow-y: auto;
+#cookie-count { 
+    font-size: clamp(1.8rem, 5vw, 3.5rem); 
+    margin: 0; 
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+#cps-display { 
+    color: var(--main-red); 
+    margin: 5px 0 20px 0; 
+    font-weight: bold;
+    font-size: 1.1rem;
 }
 
 /* DER CSS KEKS */
 #cookie-container {
-    width: 260px;
-    height: 260px;
+    width: clamp(200px, 40vh, 300px);
+    height: clamp(200px, 40vh, 300px);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     user-select: none;
-    transition: transform 0.05s;
+    transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1);
 }
 
 #cookie-css {
     position: relative;
-    width: 220px;
-    height: 220px;
+    width: 90%;
+    height: 90%;
     background: radial-gradient(circle at 35% 35%, var(--cookie-color), var(--cookie-dark));
     border-radius: 50%;
     border: 4px solid #5d3a1a;
-    box-shadow: inset -10px -10px 15px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: inset -8px -8px 15px rgba(0,0,0,0.3), 0 15px 40px rgba(0,0,0,0.6);
 }
 
-/* Schokostückchen */
 .chip {
     position: absolute;
     background: var(--choco-chip);
-    width: 30px;
-    height: 26px;
+    width: 14%;
+    height: 12%;
     border-radius: 40% 60% 70% 30% / 50% 40% 60% 50%;
     box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6);
 }
 
+/* Positionen der Chips relativ in % */
 .c1 { top: 20%; left: 25%; }
 .c2 { top: 15%; left: 55%; transform: rotate(45deg); }
 .c3 { top: 45%; left: 40%; transform: rotate(-10deg); }
@@ -76,7 +95,22 @@ body {
 
 #cookie-container:active { transform: scale(0.92); }
 
-/* Shop Items */
+/* --- RECHTE SEITE: SHOP --- */
+.shop-section {
+    flex: 1;
+    background: var(--card-bg);
+    border-left: 2px solid #333;
+    padding: 20px;
+    overflow-y: auto; /* Shop ist separat scrollbar */
+}
+
+h2 {
+    border-bottom: 2px solid var(--main-red);
+    padding-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
 .upgrade-item {
     background: #2a2a2a;
     margin-bottom: 12px;
@@ -87,19 +121,65 @@ body {
     align-items: center;
     cursor: pointer;
     border: 2px solid transparent;
+    transition: 0.2s;
 }
 
-.upgrade-item:hover { border-color: var(--main-red); background: #333; }
-.upgrade-item.locked { opacity: 0.4; cursor: not-allowed; }
+@media (hover: hover) {
+    .upgrade-item:hover { border-color: var(--main-red); background: #333; }
+}
 
-.item-name { font-weight: bold; display: block; }
-.item-price { color: var(--main-red); font-size: 0.9rem; }
-.item-amount { font-size: 1.5rem; font-weight: bold; opacity: 0.2; }
+.upgrade-item.locked { 
+    opacity: 0.3; 
+    cursor: not-allowed; 
+    filter: grayscale(1);
+}
 
-.back-btn { margin-top: 30px; color: #666; text-decoration: none; }
+.item-name { font-weight: bold; display: block; font-size: 1.1rem; }
+.item-price { color: var(--main-red); font-size: 0.9rem; font-weight: bold; }
+.item-amount { font-size: 1.8rem; font-weight: bold; opacity: 0.15; }
 
-/* Mobile */
-@media (max-width: 800px) {
-    .game-container { flex-direction: column; overflow-y: auto; }
-    .click-section { height: 60vh; border-right: none; border-bottom: 2px solid #333; }
+.back-btn { margin-top: 30px; color: #666; text-decoration: none; font-size: 0.9rem; transition: 0.2s; }
+.back-btn:hover { color: white; }
+
+/* --- RESPONSIVE BREAKPOINTS --- */
+
+/* TABLET (iPad etc.) */
+@media (max-width: 1024px) {
+    .click-section { flex: 1.2; }
+    #cookie-container { width: 220px; height: 220px; }
+}
+
+/* SMARTPHONE (Portrait) */
+@media (max-width: 768px) {
+    .game-container {
+        flex-direction: column;
+        overflow-y: auto; /* Ganze Seite scrollt auf dem Handy */
+    }
+
+    .click-section {
+        flex: none;
+        height: 70vh; /* Keks bekommt festen Platz oben */
+        border-right: none;
+        border-bottom: 2px solid #333;
+    }
+
+    .shop-section {
+        flex: none;
+        height: auto;
+        border-left: none;
+        padding: 20px 15px;
+    }
+
+    #cookie-container { width: 180px; height: 180px; }
+    
+    .upgrade-item {
+        padding: 12px;
+    }
+}
+
+/* GANZ KLEINE HANDYS */
+@media (max-width: 400px) {
+    #cookie-count { font-size: 1.8rem; }
+    #cookie-container { width: 150px; height: 150px; }
+    .upgrade-item { border-radius: 10px; }
 }
