@@ -1,106 +1,112 @@
-let money = 0; let distance = 0;
-let up_plane = 1, up_power = 1, up_money = 1;
-let gameState = 'slingshot';
-let posX = 0, posY = 200, sideX = 0, velX = 0, velY = 0;
-let isDragging = false, startX, startY;
+import * as THREE from 'three';
 
-const plane = document.getElementById('plane');
-const planeCont = document.getElementById('plane-container');
-const world = document.getElementById('world');
-const distIcon = document.getElementById('dist-plane-icon');
+// --- SETUP ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB); // Voodoo Blau
 
-function gameLoop() {
-    if (gameState === 'flying') {
-        velY -= 0.15; // Schwerkraft
-        velX += 0.05 * (up_plane / 4); // Upgrade Speed
-        
-        posY += velY;
-        distance += velX;
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true; // ECHTE SCHATTEN!
+document.body.appendChild(renderer.domElement);
 
-        // Visuals: Flugzeug neigen
-        planeCont.style.bottom = posY + "px";
-        planeCont.style.left = `calc(50% + ${sideX}px)`;
-        planeCont.style.transform = `rotateX(${-velY * 3}deg) rotateZ(${sideX / 10}deg)`;
-        
-        // Welt bewegen
-        world.style.backgroundPositionY = (distance * 10) + "px";
-        world.style.left = `calc(-100vw - ${sideX}px)`;
+// --- LICHT (Macht den Look!) ---
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
 
-        // Distanz-Meter (Flugzeug wandert nach oben)
-        let progress = Math.min(200, (distance / 1000) * 200);
-        distIcon.style.transform = `translateY(${-progress}px)`;
+const sun = new THREE.DirectionalLight(0xffffff, 1);
+sun.position.set(5, 10, 5);
+sun.castShadow = true;
+scene.add(sun);
 
-        if (posY < 50) finish();
+// --- WELT ---
+const groundGeo = new THREE.PlaneGeometry(100, 1000);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x9ACD32 }); // Gras
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// --- FLUGZEUG (Karton-Style) ---
+const planeGroup = new THREE.Group();
+const bodyGeo = new THREE.BoxGeometry(0.5, 0.4, 2);
+const cardboardMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c }); // Karton
+const body = new THREE.Mesh(bodyGeo, cardboardMat);
+body.castShadow = true;
+planeGroup.add(body);
+
+// Flügel (werden später sichtbar bei Upgrades)
+const wingGeo = new THREE.BoxGeometry(2.5, 0.05, 0.6);
+const wings = new THREE.Mesh(wingGeo, cardboardMat);
+wings.position.y = 0.1;
+wings.visible = false; // Startet ohne Flügel
+planeGroup.add(wings);
+
+scene.add(planeGroup);
+camera.position.set(0, 2, 5);
+
+// --- LOGIK ---
+let speed = 0;
+let altitude = 0.5;
+let isFlying = false;
+let money = 0;
+let dist = 0;
+let lvlWings = false;
+
+document.getElementById('start-btn').onclick = () => {
+    isFlying = true;
+    speed = 0.5; // Katapult-Schwung
+    document.getElementById('menu').classList.add('hidden');
+};
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (isFlying) {
+        // Flug-Physik
+        dist += speed;
+        altitude += (speed * 0.1) - 0.05; // Steigen/Sinken
+        speed *= 0.995; // Luftwiderstand
+
+        planeGroup.position.z -= speed;
+        planeGroup.position.y = altitude;
+
+        // Kamera folgt dem Flugzeug
+        camera.position.z = planeGroup.position.z + 5;
+        camera.position.y = planeGroup.position.y + 2;
+        camera.lookAt(planeGroup.position);
+
+        // Boden-Loop (damit die Welt nicht endet)
+        if (dist % 50 < 0.5) ground.position.z -= 50;
+
+        // Landung
+        if (altitude <= 0.2) {
+            isFlying = false;
+            money += Math.floor(dist / 2);
+            document.getElementById('menu').classList.remove('hidden');
+            // Reset für nächsten Start
+            planeGroup.position.set(0, 0.5, 0);
+            dist = 0; altitude = 0.5;
+        }
     }
+
     updateUI();
-    requestAnimationFrame(gameLoop);
-}
-
-// Slingshot Steuerung
-window.onpointerdown = (e) => {
-    if (gameState !== 'slingshot') return;
-    isDragging = true; startX = e.clientX; startY = e.clientY;
-};
-
-window.onpointermove = (e) => {
-    if (isDragging) {
-        let dx = startX - e.clientX;
-        let dy = startY - e.clientY;
-        planeCont.style.transform = `translate(${-dx/4}px, ${dy/4}px) rotate(${dx/10}deg)`;
-    }
-    if (gameState === 'flying') {
-        sideX = (e.clientX - window.innerWidth/2) * 1.5;
-    }
-};
-
-window.onpointerup = (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    velX = Math.abs(startX - e.clientX) / 7 * up_power;
-    velY = (startY - e.clientY) / 4 * up_power;
-    if (velX > 1) gameState = 'flying';
-};
-
-function buyUpgrade(type) {
-    let cost = type === 'plane' ? up_plane * 100 : type === 'power' ? up_power * 100 : up_money * 100;
-    if (money >= cost) {
-        money -= cost;
-        if (type === 'plane') up_plane++;
-        if (type === 'power') up_power += 0.3;
-        if (type === 'money') up_money += 0.5;
-        updateEvolution();
-    }
-}
-
-function updateEvolution() {
-    plane.className = "";
-    if (up_plane >= 20) plane.classList.add('lvl-20');
-    else if (up_plane >= 10) plane.classList.add('lvl-10');
-    else if (up_plane >= 5) plane.classList.add('lvl-5');
-    
-    document.getElementById('lvl-plane').innerText = Math.floor(up_plane);
-    document.getElementById('lvl-power').innerText = Math.floor(up_power);
-    document.getElementById('lvl-money').innerText = Math.floor(up_money);
-}
-
-function finish() {
-    gameState = 'landed';
-    money += Math.floor(distance * up_money);
-    document.getElementById('upgrade-menu').classList.remove('hidden');
-}
-
-function resetFlight() {
-    gameState = 'slingshot'; distance = 0; posY = 200; sideX = 0; velX = 0; velY = 0;
-    document.getElementById('upgrade-menu').classList.add('hidden');
-    distIcon.style.transform = `translateY(0)`;
+    renderer.render(scene, camera);
 }
 
 function updateUI() {
-    document.getElementById('money-display').innerText = Math.floor(money);
-    document.getElementById('dist-display').innerText = Math.floor(distance) + "m";
-    document.getElementById('p-plane').innerText = Math.floor(up_plane * 100);
-    document.getElementById('p-power').innerText = Math.floor(up_power * 100);
-    document.getElementById('p-mon').innerText = Math.floor(up_money * 100);
+    document.getElementById('money').innerText = money;
+    document.getElementById('dist').innerText = Math.floor(dist);
 }
 
-gameLoop();
+// Global für Buttons
+window.upgrade = (type) => {
+    if (type === 'wings' && money >= 150) {
+        money -= 150;
+        wings.visible = true;
+        lv wings = true;
+    }
+    updateUI();
+};
+
+animate();
