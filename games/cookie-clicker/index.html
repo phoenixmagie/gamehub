@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cookie Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="click-section">
+            <h1 id="cookie-count">0 Cookies</h1>
+            <p id="cps-display">0 per second</p>
+            <div id="cookie" onclick="clickCookie()">
+                <img src="../../pictures/icons/cookie.png" alt="Cookie" onerror="this.src='https://cdn-icons-png.flaticon.com/512/548/548427.png'">
+            </div>
+            <a href="../../index.html" class="back-btn">Zurück zum Hub</a>
+        </div>
+
+        <div class="shop-section">
+            <h2>Shop</h2>
+            <div class="upgrade" onclick="buyUpgrade('cursor', 15, 0.1)">
+                <div class="info">
+                    <span class="name">Cursor</span>
+                    <span class="price" id="cursor-price">15 Cookies</span>
+                </div>
+                <span class="amount" id="cursor-amount">0</span>
+            </div>
+            <div class="upgrade" onclick="buyUpgrade('grandma', 100, 1)">
+                <div class="info">
+                    <span class="name">Oma</span>
+                    <span class="price" id="grandma-price">100 Cookies</span>
+                </div>
+                <span class="amount" id="grandma-amount">0</span>
+            </div>
+            <div class="upgrade" onclick="buyUpgrade('farm', 1100, 8)">
+                <div class="info">
+                    <span class="name">Farm</span>
+                    <span class="price" id="farm-price">1100 Cookies</span>
+                </div>
+                <span class="amount" id="farm-amount">0</span>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
