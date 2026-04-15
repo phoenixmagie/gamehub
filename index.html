@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e60000">
+    
     <title>Phoenixmagie | Game Hub</title>
     <style>
         :root {
@@ -164,35 +167,35 @@
         @media (max-width: 480px) {
             header { padding: 30px 5px; }
             .container { padding: 12px; }
-            
+
             .game-grid {
                 /* Exakt 2 Spalten auf dem Handy */
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
-            
+
             .game-card {
                 padding: 15px 10px;
                 min-height: 240px;
                 border-radius: 18px;
             }
-            
+
             .game-card img {
                 width: 60px;
                 height: 60px;
                 border-radius: 15px;
             }
-            
+
             .game-card h3 {
                 font-size: 0.95rem;
                 margin: 5px 0 10px 0;
             }
-            
+
             .play-btn {
                 padding: 10px 0;
                 font-size: 0.8rem;
             }
-            
+
             .highscore-text {
                 font-size: 0.75rem;
                 margin-top: 8px;
@@ -233,14 +236,14 @@
         // Kacheln erstellen
         filtered.forEach(game => {
             const highscore = allData[game.id]?.highscore || 0;
-            
+
             const card = document.createElement('div');
             card.className = 'game-card';
             card.innerHTML = `
                 <img src="${game.icon}" alt="${game.game_name}" onerror="this.src='https://via.placeholder.com/100/333/e60000?text=?'">
                 <h3>${game.game_name}</h3>
                 <a href="${game.path}" class="play-btn" style="background-color: ${game.btn_color}">Spielen</a>
-                <span class="highscore-text">Best: ${highscore}</span>
+>
             `;
             grid.appendChild(card);
         });
@@ -259,6 +262,15 @@
 
     // Beim Start einmal alles laden
     window.onload = () => renderHub();
+
+    // Service Worker Registrierung
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('SW registriert!'))
+                .catch(err => console.log('SW Fehler', err));
+        });
+    }
 </script>
 
 </body>
