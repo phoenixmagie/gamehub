@@ -1,31 +1,25 @@
 let cookies = 0;
-let cps = 0;
-let upgrades = {
-    cursor: { amount: 0, cost: 15, power: 0.1 },
-    grandma: { amount: 0, cost: 100, power: 1 },
-    farm: { amount: 0, cost: 1100, power: 8 }
-};
+let totalCps = 0;
 
-// Spiel laden
-function loadGame() {
+const upgrades = [
+    { id: 'cursor', name: 'Cursor', baseCost: 15, power: 0.1, amount: 0 },
+    { id: 'grandma', name: 'Oma', baseCost: 100, power: 1, amount: 0 },
+    { id: 'farm', name: 'Farm', baseCost: 1100, power: 8, amount: 0 },
+    { id: 'factory', name: 'Fabrik', baseCost: 12000, power: 47, amount: 0 }
+];
+
+function init() {
     const saved = JSON.parse(localStorage.getItem('myWebGames')) || {};
-    const data = saved['cookie_clicker']; // ID aus deiner games.js
+    const state = saved['cookie-clicker'];
 
-    if (data && data.fullState) {
-        cookies = data.fullState.cookies;
-        upgrades = data.fullState.upgrades;
-        updateCPS();
+    if (state && state.fullState) {
+        cookies = state.fullState.cookies;
+        state.fullState.upgrades.forEach((u, i) => {
+            if(upgrades[i]) upgrades[i].amount = u.amount;
+        });
     }
-    updateUI();
-}
-
-function saveGame() {
-    let allData = JSON.parse(localStorage.getItem('myWebGames')) || {};
-    allData['cookie_clicker'] = {
-        highscore: Math.floor(cookies), // Für den Hub
-        fullState: { cookies, upgrades } // Für das Spiel selbst
-    };
-    localStorage.setItem('myWebGames', JSON.stringify(allData));
+    renderShop();
+    gameLoop();
 }
 
 function clickCookie() {
@@ -33,40 +27,68 @@ function clickCookie() {
     updateUI();
 }
 
-function buyUpgrade(id, baseCost, power) {
-    let upgrade = upgrades[id];
-    if (cookies >= upgrade.cost) {
-        cookies -= upgrade.cost;
-        upgrade.amount++;
-        upgrade.cost = Math.floor(upgrade.cost * 1.15); // Preis steigt um 15%
-        updateCPS();
-        updateUI();
-        saveGame();
-    }
-}
+function buyUpgrade(index) {
+    const item = upgrades[index];
+    const cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
 
-function updateCPS() {
-    cps = 0;
-    for (let id in upgrades) {
-        cps += upgrades[id].amount * upgrades[id].power;
+    if (cookies >= cost) {
+        cookies -= cost;
+        item.amount++;
+        renderShop();
+        updateUI();
+        save();
     }
 }
 
 function updateUI() {
-    document.getElementById('cookie-count').innerText = Math.floor(cookies) + " Cookies";
-    document.getElementById('cps-display').innerText = cps.toFixed(1) + " per second";
-    
-    for (let id in upgrades) {
-        document.getElementById(id + '-price').innerText = upgrades[id].cost + " Cookies";
-        document.getElementById(id + '-amount').innerText = upgrades[id].amount;
-    }
+    document.getElementById('cookie-count').innerText = Math.floor(cookies).toLocaleString() + " Cookies";
+    totalCps = upgrades.reduce((sum, item) => sum + (item.amount * item.power), 0);
+    document.getElementById('cps-display').innerText = totalCps.toFixed(1) + " pro Sekunde";
 }
 
-// Alle 1 Sekunde Cookies hinzufügen und speichern
-setInterval(() => {
-    cookies += cps / 10;
-    updateUI();
-    if (Math.random() < 0.1) saveGame(); // Alle 1s mit 10% Chance speichern (schont Performance)
-}, 100);
+function renderShop() {
+    const container = document.getElementById('shop-items');
+    container.innerHTML = upgrades.map((item, index) => {
+        const cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
+        return `
+            <div class="upgrade-item ${cookies < cost ? 'locked' : ''}" onclick="buyUpgrade(${index})">
+                <div>
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-price">Preis: ${cost.toLocaleString()}</span>
+                </div>
+                <span class="item-amount">${item.amount}</span>
+            </div>
+        `;
+    }).join('');
+}
 
-loadGame();
+function save() {
+    const allData = JSON.parse(localStorage.getItem('myWebGames')) || {};
+    allData['cookie-clicker'] = {
+        highscore: Math.floor(cookies),
+        fullState: {
+            cookies: cookies,
+            upgrades: upgrades.map(u => ({ amount: u.amount }))
+        }
+    };
+    localStorage.setItem('myWebGames', JSON.stringify(allData));
+}
+
+function gameLoop() {
+    setInterval(() => {
+        cookies += totalCps / 10;
+        updateUI();
+        
+        // Shop-Status prüfen
+        const items = document.querySelectorAll('.upgrade-item');
+        upgrades.forEach((u, i) => {
+            const cost = Math.floor(u.baseCost * Math.pow(1.15, u.amount));
+            if(cookies >= cost) items[i]?.classList.remove('locked');
+            else items[i]?.classList.add('locked');
+        });
+    }, 100);
+    
+    setInterval(save, 15000); // Alle 15 Sek Auto-Save
+}
+
+init();
