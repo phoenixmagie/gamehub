@@ -21,7 +21,7 @@ function loadGame() {
 
 function saveGame() {
     let allData = JSON.parse(localStorage.getItem('myWebGames')) || {};
-    allData['cookie_clicker_01'] = {
+    allData['cookie_clicker'] = {
         highscore: Math.floor(cookies), // Für den Hub
         fullState: { cookies, upgrades } // Für das Spiel selbst
     };
