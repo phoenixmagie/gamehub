@@ -1,24 +1,22 @@
-body { 
-    background: #1a1a1a; 
-    color: white; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
+/* Grund-Design */
+body {
+    background: #1a1a1a;
+    color: white;
     font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
 }
 
-canvas { 
-    border: 2px solid #555; 
-    background: #4ec0ca; 
-    display: block; 
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-#currentScore { 
-    font-size: 40px; 
-    margin: 10px; 
-}
-
-/* design für den zurück-link */
+/* Zurück-Link */
 .back-link {
     color: #ffcc00;
     text-decoration: none;
@@ -30,12 +28,62 @@ canvas {
     text-decoration: underline;
 }
 
-button { 
-    padding: 15px 30px; 
-    font-size: 18px; 
-    cursor: pointer; 
-    background: #ffcc00; 
-    border: none; 
-    border-radius: 5px; 
+/* Score-Anzeige */
+#currentScore {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Wrapper für Canvas und Overlay */
+.canvas-wrapper {
+    position: relative;
+}
+
+canvas {
+    background: #4ec0ca;
+    border: 4px solid #333;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Das Restart-Menü (jetzt komplett hier gestylt) */
+#restartMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    display: none; /* Wird via JS auf 'block' gesetzt */
+    width: 220px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+#restartMenu h2 {
+    margin-top: 0;
+    color: #ff4444;
+    text-transform: lowercase;
+}
+
+/* Buttons */
+button {
+    background: #ffcc00;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.controls {
     margin-top: 20px;
 }
