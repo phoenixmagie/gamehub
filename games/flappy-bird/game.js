@@ -1,65 +1,58 @@
-// ==========================================
-// Einstellung: Speed & Physik
-// ==========================================
 const speed = 20;    
 const gravity = 0.25; 
 const jump = -4.5;   
 
-// --- 1. Setup ---
 const canvas = document.getElementById("birdCanvas");
 const ctx = canvas.getContext("2d");
 const scoredisplay = document.getElementById("currentScore");
+const restartMenu = document.getElementById("restartMenu");
+const btnRestart = document.getElementById("btnRestart");
 
-let score = 0;
-let birdy = 200;     
-let birdv = 0;       
-let pipes = [];      
-let gap = 130;       
+let score, birdy, birdv, pipes, gameloop, isGameOver;
+const gap = 130;
 
-pipes[0] = { x: canvas.width, y: 100 };
+function init() {
+    score = 0;
+    birdy = 200;
+    birdv = 0;
+    pipes = [{ x: canvas.width, y: 100 }];
+    isGameOver = false;
+    scoredisplay.innerText = "0";
+    restartMenu.style.display = "none";
+    
+    if (gameloop) clearInterval(gameloop);
+    gameloop = setInterval(update, speed);
+}
 
-// --- 2. Steuerung ---
 document.addEventListener("keydown", (e) => {
-    if (e.code === "Space" || e.keyCode === 32 || e.keyCode === 38) flap();
+    if ((e.code === "Space" || e.keyCode === 32) && !isGameOver) flap();
 });
 
-if (document.getElementById("btnJump")) {
-    document.getElementById("btnJump").onclick = flap;
-}
+document.getElementById("btnJump").onclick = () => { if(!isGameOver) flap(); };
+btnRestart.onclick = init;
 
-function flap() {
-    birdv = jump; 
-}
+function flap() { birdv = jump; }
 
-// --- 3. Highscore speichern ---
 function savescore(points) {
     const data = JSON.parse(localStorage.getItem('myWebGames')) || {};
-    const gameid = 'flappybird'; 
-
-    if (!data[gameid] || points > data[gameid].highscore) {
-        data[gameid] = { highscore: points };
+    if (!data['flappybird'] || points > data['flappybird'].highscore) {
+        data['flappybird'] = { highscore: points };
         localStorage.setItem('myWebGames', JSON.stringify(data));
     }
 }
 
-// --- 4. Haupt-Loop ---
 function update() {
-    // Hintergrund
     ctx.fillStyle = "#4ec0ca";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Vogel-Physik
     birdv += gravity;
     birdy += birdv;
 
-    // Vogel zeichnen
     ctx.fillStyle = "#ffcc00";
     ctx.fillRect(50, birdy, 25, 25);
 
     for (let i = 0; i < pipes.length; i++) {
         ctx.fillStyle = "#2ecc71";
-        
-        // Röhren zeichnen
         ctx.fillRect(pipes[i].x, 0, 50, pipes[i].y);
         ctx.fillRect(pipes[i].x, pipes[i].y + gap, 50, canvas.height);
 
@@ -72,47 +65,28 @@ function update() {
             });
         }
 
-        // --- STRENGE KOLLISIONSPRÜFUNG ---
-        let birdRight = 50 + 25;
-        let birdLeft = 50;
-        let birdBottom = birdy + 25;
-        let birdTop = birdy;
-        
-        let pipeRight = pipes[i].x + 50;
-        let pipeLeft = pipes[i].x;
-        let upperPipeBottom = pipes[i].y;
-        let lowerPipeTop = pipes[i].y + gap;
-
-        // Prüfung: Ist der Vogel horizontal auf Höhe der Röhre?
-        if (birdRight > pipeLeft && birdLeft < pipeRight) {
-            // Berührt er die obere oder die untere Röhre?
-            if (birdTop < upperPipeBottom || birdBottom > lowerPipeTop) {
-                endGame();
-                return;
-            }
-        }
-
-        // Prüfung: Boden oder Decke berührt?
-        if (birdBottom >= canvas.height || birdTop <= 0) {
-            endGame();
+        if (
+            (50 + 25 > pipes[i].x && 50 < pipes[i].x + 50 && 
+            (birdy < pipes[i].y || birdy + 25 > pipes[i].y + gap)) ||
+            birdy + 25 > canvas.height || birdy < 0
+        ) {
+            gameOver();
             return;
         }
 
-        // Punkte zählen
         if (pipes[i].x === 40) {
             score++;
-            if (scoredisplay) scoredisplay.innerText = score;
+            scoredisplay.innerText = score;
         }
     }
-
     if (pipes.length > 5) pipes.shift();
 }
 
-function endGame() {
+function gameOver() {
+    isGameOver = true;
     clearInterval(gameloop);
     savescore(score);
-    alert("Spiel vorbei! Dein Score: " + score);
-    location.reload();
+    restartMenu.style.display = "block";
 }
 
-const gameloop = setInterval(update, speed);
+init();
