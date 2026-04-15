@@ -20,7 +20,16 @@ const GAMES_DATA = [
     path: "games/tower-defense/index.html",
     icon: "pictures/icons/tower-defense.png",
     btn_color: "#27ae60"
-}
+},
+
+{
+        id: "snake",
+        game_name: "Snake",
+        icon: "image/icons/snake.png", // Pfad zu deinem Icon
+        path: "snake/index.html",     // Pfad zu deiner Snake-index.html
+        btn_color: "#e60000"
+    },
+
 
     /*{
         id: "beispiel",
