@@ -8,37 +8,51 @@
 </head>
 <body>
     <div id="game-viewport">
-        <div id="lvl-tag">LEVEL 1</div>
-        
+        <div id="dist-meter">
+            <div id="finish-flag">🏁</div>
+            <div id="dist-plane-icon">✈️</div>
+        </div>
+
         <div id="world"></div>
 
         <div id="plane-container">
-            <div id="plane" class="lvl-1">
+            <div id="plane">
                 <div class="body"></div>
                 <div class="cockpit"></div>
                 <div class="wings"></div>
-                <div class="engines"></div>
                 <div class="tail"></div>
             </div>
         </div>
 
         <div id="hud">
-            <div id="money-display">0 $</div>
-            <div id="dist-display">0 m</div>
+            <div class="stat-box">💰 <span id="money-display">0</span></div>
+            <div class="stat-box">📏 <span id="dist-display">0m</span></div>
         </div>
 
-        <div id="upgrade-menu" class="hidden">
-            <h1 class="evo-title">EVOLVE!</h1>
-            <p id="flight-info"></p>
+        <div id="upgrade-menu">
+            <div class="hangar-title">Zum Fliegen tippen</div>
+            
             <div class="shop">
-                <div class="item" onclick="buyUpgrade('plane')">
-                    🚀 FLUGZEUG<br><span id="p-plane">200$</span>
+                <div class="card" onclick="buyUpgrade('power')">
+                    <div class="card-lvl" id="lvl-power">1</div>
+                    <div class="card-icon">🎯</div>
+                    <div class="card-name">SCHLEUDER</div>
+                    <button class="card-btn"><span id="p-power">100</span> $</button>
                 </div>
-                <div class="item" onclick="buyUpgrade('power')">
-                    ⚓ POWER<br><span id="p-power">150$</span>
+                <div class="card" onclick="buyUpgrade('plane')">
+                    <div class="card-lvl" id="lvl-plane">1</div>
+                    <div class="card-icon">🛩️</div>
+                    <div class="card-name">FLUGZEUG</div>
+                    <button class="card-btn"><span id="p-plane">100</span> $</button>
+                </div>
+                <div class="card" onclick="buyUpgrade('money')">
+                    <div class="card-lvl" id="lvl-money">1</div>
+                    <div class="card-icon">💸</div>
+                    <div class="card-name">EINKOMMEN</div>
+                    <button class="card-btn"><span id="p-mon">100</span> $</button>
                 </div>
             </div>
-            <button class="start-btn" onclick="resetFlight()">NÄCHSTER START</button>
+            <button class="big-start-btn" onclick="resetFlight()">START</button>
         </div>
     </div>
     <script src="game.js"></script>
