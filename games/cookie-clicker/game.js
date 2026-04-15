@@ -1,13 +1,13 @@
 /**
  * COOKIE CLICKER - GAME LOGIC
+ * Dateiname: game.js
  * ID: cookie-clicker
  */
 
-// 1. Variablen initialisieren
 let cookies = 0;
 let totalCps = 0;
 
-// Shop-Inhalt definieren
+// Die Liste der Upgrades
 const upgrades = [
     { id: 'cursor', name: 'Cursor', baseCost: 15, power: 0.1, amount: 0 },
     { id: 'grandma', name: 'Oma', baseCost: 100, power: 1, amount: 0 },
@@ -17,7 +17,7 @@ const upgrades = [
 ];
 
 /**
- * START-FUNKTION
+ * Initialisierung beim Laden
  */
 function init() {
     // Daten aus LocalStorage laden
@@ -26,7 +26,7 @@ function init() {
 
     if (myState && myState.fullState) {
         cookies = myState.fullState.cookies || 0;
-        // Upgrades laden und mit dem Standard-Array abgleichen
+        // Gekaufte Mengen wiederherstellen
         myState.fullState.upgrades.forEach((savedUp, index) => {
             if (upgrades[index]) {
                 upgrades[index].amount = savedUp.amount;
@@ -34,61 +34,54 @@ function init() {
         });
     }
 
-    // UI das erste Mal zeichnen
+    // UI aufbauen
     renderShop();
     updateUI();
 
-    // Event Listener für "Notfall-Speicherung" beim Schließen des Tabs
+    // WICHTIG: Speichert, wenn der Tab geschlossen oder die Seite verlassen wird
     window.addEventListener('beforeunload', save);
-
+    
     // Spiel-Loop starten
     startGameLoop();
 }
 
 /**
- * KLICK-LOGIK
+ * Die Haupt-Klickfunktion
  */
 function clickCookie() {
     cookies++;
-    
-    // Kleiner visueller Schutz: Alle 10 Klicks im Hintergrund speichern
-    if (Math.floor(cookies) % 10 === 0) {
-        save();
-    }
-    
     updateUI();
 }
 
 /**
- * KAUF-LOGIK
+ * Upgrade kaufen
  */
 function buyUpgrade(index) {
     const item = upgrades[index];
-    // Preisformel: Basiskosten * 1.15 ^ Anzahl
     const currentCost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
 
     if (cookies >= currentCost) {
         cookies -= currentCost;
         item.amount++;
         
-        renderShop(); // Shop neu zeichnen (Preise haben sich geändert)
-        updateUI();
         save(); // Sofort speichern nach Kauf
+        renderShop();
+        updateUI();
     }
 }
 
 /**
- * UI AKTUALISIEREN
+ * Benutzeroberfläche aktualisieren
  */
 function updateUI() {
-    // Cookie-Zahl anzeigen
+    // Cookie Zahl anzeigen
     document.getElementById('cookie-count').innerText = Math.floor(cookies).toLocaleString() + " Cookies";
     
-    // CPS berechnen
+    // CPS berechnen (Cookies pro Sekunde)
     totalCps = upgrades.reduce((sum, item) => sum + (item.amount * item.power), 0);
     document.getElementById('cps-display').innerText = totalCps.toFixed(1) + " pro Sekunde";
 
-    // Prüfen, ob Shop-Items jetzt bezahlbar sind (für die graue Darstellung)
+    // Shop-Items prüfen (sind sie bezahlbar?)
     const items = document.querySelectorAll('.upgrade-item');
     upgrades.forEach((u, i) => {
         const cost = Math.floor(u.baseCost * Math.pow(1.15, u.amount));
@@ -101,10 +94,12 @@ function updateUI() {
 }
 
 /**
- * SHOP GENERIEREN
+ * Den Shop im HTML generieren
  */
 function renderShop() {
     const container = document.getElementById('shop-items');
+    if (!container) return;
+    
     container.innerHTML = "";
 
     upgrades.forEach((item, index) => {
@@ -126,14 +121,14 @@ function renderShop() {
 }
 
 /**
- * SPEICHER-FUNKTION
+ * Die Speicher-Funktion (LocalStorage)
  */
 function save() {
     let allData = JSON.parse(localStorage.getItem('myWebGames')) || {};
     
-    // WICHTIG: Die ID muss exakt 'cookie-clicker' sein für den Hub
+    // Speicherung unter der ID für den Hub
     allData['cookie-clicker'] = {
-        highscore: Math.floor(cookies),
+        highscore: Math.floor(cookies), // Wird im Hub angezeigt
         fullState: {
             cookies: cookies,
             upgrades: upgrades.map(u => ({ amount: u.amount }))
@@ -141,13 +136,14 @@ function save() {
     };
     
     localStorage.setItem('myWebGames', JSON.stringify(allData));
+    console.log("Gespeichert!");
 }
 
 /**
- * GAME LOOP (Ticks)
+ * Game-Loop für CPS und automatisches Speichern
  */
 function startGameLoop() {
-    // Alle 100ms (10x pro Sekunde) Cookies hinzufügen für flüssige Anzeige
+    // 10 mal pro Sekunde Cookies hinzufügen (flüssiger)
     setInterval(() => {
         if (totalCps > 0) {
             cookies += totalCps / 10;
@@ -155,9 +151,9 @@ function startGameLoop() {
         }
     }, 100);
 
-    // Alle 30 Sekunden automatisches Backup
+    // Alle 30 Sekunden im Hintergrund speichern
     setInterval(save, 30000);
 }
 
-// Initialisierung starten
+// Start!
 init();
