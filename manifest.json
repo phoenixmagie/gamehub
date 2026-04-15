@@ -1,0 +1,22 @@
+{
+  "short_name": "Gameshub",
+  "name": "Gameshub",
+  "icons": [
+    {
+      "src": "/pictures/app/icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/pictures/app/Icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#0d1117",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#ff4500",
+  "description": "Dein Gameshub für viele Spiele!"
+}
