@@ -7,6 +7,13 @@ const GAMES_DATA = [
     icon: "pictures/icons/cookie.png",
     btn_color: "#D2691E"
 },
+    {
+        id: "plane-catapult",
+        game_name: "Plane Catapult",
+        path: "games/plane-catapult/index.html",
+        icon: "pictures/icons/plane.png",
+        btn_color: "#3498db" // Blau für das Flugzeug-Spiel
+    },
 
     /*{
         id: "beispiel",
