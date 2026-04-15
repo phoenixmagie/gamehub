@@ -1,9 +1,9 @@
 // ==========================================
-// einstellung: speed & schwerkraft
+// einstellung: speed & physik
 // ==========================================
-const speed = 20;    // millisekunden pro frame (je niedriger, desto flüssiger)
-const gravity = 0.25; // wie schnell der vogel fällt
-const jump = -4.5;   // wie hoch der vogel springt
+const speed = 20;    // millisekunden pro frame
+const gravity = 0.25; // schwerkraft
+const jump = -4.5;   // sprungstärke
 
 // --- 1. setup ---
 const canvas = document.getElementById("birdCanvas");
@@ -11,46 +11,48 @@ const ctx = canvas.getContext("2d");
 const scoredisplay = document.getElementById("currentScore");
 
 let score = 0;
-let birdy = 200;     // y-position des vogels
-let birdv = 0;       // geschwindigkeit (velocity) des vogels
-let pipes = [];      // array für die hindernisse
-let gap = 120;       // lücke zwischen den röhren
+let birdy = 200;     // vogel höhe
+let birdv = 0;       // vogel geschwindigkeit
+let pipes = [];      // hindernis-liste
+let gap = 130;       // lücke zwischen den röhren
 
-// das erste hindernis erstellen
-pipes[0] = { x: canvas.width, y: 0 };
+// erste röhre erstellen
+pipes[0] = { x: canvas.width, y: 50 };
 
 // --- 2. steuerung ---
 document.addEventListener("keydown", flap);
 if(document.getElementById("btnJump")) document.getElementById("btnJump").onclick = flap;
 
 function flap() {
-    birdv = jump; // setzt die geschwindigkeit auf einen negativen wert -> vogel steigt
+    birdv = jump; // vogel bekommt schwung nach oben
 }
 
-// --- 3. haupt-loop ---
+// --- 3. spiellogik ---
 function update() {
-    // hintergrund zeichnen
+    // hintergrund (himmel)
     ctx.fillStyle = "#4ec0ca";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // vogel bewegen & zeichnen
+    // vogel bewegen (physik)
     birdv += gravity;
     birdy += birdv;
-    ctx.fillStyle = "#ffcc00"; // gelber vogel
+
+    // vogel zeichnen
+    ctx.fillStyle = "#ffcc00";
     ctx.fillRect(50, birdy, 25, 25);
 
-    // röhren (hindernisse) verarbeiten
+    // hindernisse verarbeiten
     for (let i = 0; i < pipes.length; i++) {
-        ctx.fillStyle = "#2ecc71"; // grüne röhren
+        ctx.fillStyle = "#2ecc71"; // röhrenfarbe (grün)
         
         // obere röhre
         ctx.fillRect(pipes[i].x, 0, 50, pipes[i].y);
         // untere röhre
         ctx.fillRect(pipes[i].x, pipes[i].y + gap, 50, canvas.height);
 
-        pipes[i].x -= 2; // röhren nach links bewegen
+        pipes[i].x -= 2; // röhre nach links schieben
 
-        // neue röhre erstellen, wenn die alte weit genug weg ist
+        // neue röhre generieren
         if (pipes[i].x === 120) {
             pipes.push({
                 x: canvas.width,
@@ -58,11 +60,11 @@ function update() {
             });
         }
 
-        // kollision prüfen
+        // kollisionsprüfung (röhren, boden oder decke)
         if (50 + 25 > pipes[i].x && 50 < pipes[i].x + 50 && 
            (birdy < pipes[i].y || birdy + 25 > pipes[i].y + gap) ||
             birdy + 25 > canvas.height || birdy < 0) {
-            location.reload(); // neustart bei fehler
+            location.reload(); 
         }
 
         // punkte zählen
@@ -72,8 +74,9 @@ function update() {
         }
     }
 
-    // alte röhren aus dem speicher löschen
+    // alte röhren entfernen (performance)
     if (pipes.length > 5) pipes.shift();
 }
 
+// spiel starten
 const gameloop = setInterval(update, speed);
