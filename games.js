@@ -18,7 +18,7 @@ const GAMES_DATA = [
     id: "tower-defense",
     game_name: "Tower Defense",
     path: "games/tower-defense/index.html",
-    icon: "pictures/icons/tower.png",
+    icon: "pictures/icons/tower-defense.png",
     btn_color: "#27ae60"
 }
 
