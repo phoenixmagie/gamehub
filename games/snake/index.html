@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phoenix Snake</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <div class="header">
+            <span class="score-board">Score: <span id="currentScore">0</span></span>
+        </div>
+
+        <canvas id="snakeCanvas" width="400" height="400"></canvas>
+
+        <div class="mobile-controls">
+            <button class="ctrl-btn" id="btnUp">▲</button>
+            <div class="mid-row">
+                <button class="ctrl-btn" id="btnLeft">◀</button>
+                <button class="ctrl-btn" id="btnDown">▼</button>
+                <button class="ctrl-btn" id="btnRight">▶</button>
+            </div>
+        </div>
+        
+        <a href="index.html" class="exit-link">Zurück zum Hub</a>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
