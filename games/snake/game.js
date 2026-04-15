@@ -1,98 +1,115 @@
-const canvas = document.getElementById("snakeCanvas");
-const ctx = canvas.getContext("2d");
-const scoreDisplay = document.getElementById("currentScore");
+// ==========================================
+// einstellung: speed
+// ==========================================
+const speed = 200; // millisekunden pro schritt (z. b. 100 = schnell, 300 = langsam)
 
-const boxSize = 20;
+// --- 1. grund-setup ---
+const canvas = document.getelementbyid("snakecanvas");
+const ctx = canvas.getcontext("2d");
+const scoredisplay = document.getelementbyid("currentscore");
+
+const boxsize = 20; // größe eines rasters
 let score = 0;
-let direction = "RIGHT";
-let snake = [{ x: 9 * boxSize, y: 10 * boxSize }];
-let apple = spawnApple();
+let direction = "right"; 
+let snake = [{ x: 9 * boxsize, y: 10 * boxsize }];
+let apple = spawnapple();
 
-// Steuerung (Tastatur & Buttons)
-document.addEventListener("keydown", changeDirection);
-document.getElementById("btnUp").onclick = () => setDir("UP");
-document.getElementById("btnDown").onclick = () => setDir("DOWN");
-document.getElementById("btnLeft").onclick = () => setDir("LEFT");
-document.getElementById("btnRight").onclick = () => setDir("RIGHT");
+// --- 2. steuerung (tastatur & buttons) ---
+document.addeventlistener("keydown", changedirection);
 
-function setDir(newDir) {
-    if (newDir === "LEFT" && direction !== "RIGHT") direction = "LEFT";
-    if (newDir === "UP" && direction !== "DOWN") direction = "UP";
-    if (newDir === "RIGHT" && direction !== "LEFT") direction = "RIGHT";
-    if (newDir === "DOWN" && direction !== "UP") direction = "DOWN";
+document.getelementbyid("btnup").onclick = () => setdir("up");
+document.getelementbyid("btndown").onclick = () => setdir("down");
+document.getelementbyid("btnleft").onclick = () => setdir("left");
+document.getelementbyid("btnright").onclick = () => setdir("right");
+
+// setzt die richtung und verhindert, dass man direkt umkehrt
+function setdir(newdir) {
+    if (newdir === "left" && direction !== "right") direction = "left";
+    if (newdir === "up" && direction !== "down") direction = "up";
+    if (newdir === "right" && direction !== "left") direction = "right";
+    if (newdir === "down" && direction !== "up") direction = "down";
 }
 
-function changeDirection(e) {
-    const key = e.keyCode;
-    if (key == 37) setDir("LEFT");
-    if (key == 38) setDir("UP");
-    if (key == 39) setDir("RIGHT");
-    if (key == 40) setDir("DOWN");
+function changedirection(e) {
+    const key = e.keycode;
+    if (key == 37) setdir("left");
+    if (key == 38) setdir("up");
+    if (key == 39) setdir("right");
+    if (key == 40) setdir("down");
 }
 
-function spawnApple() {
+// --- 3. spielfunktionen ---
+// erzeugt einen neuen apfel an einer zufälligen position
+function spawnapple() {
     return {
-        x: Math.floor(Math.random() * 19 + 1) * boxSize,
-        y: Math.floor(Math.random() * 19 + 1) * boxSize
+        x: math.floor(math.random() * 19 + 1) * boxsize,
+        y: math.floor(math.random() * 19 + 1) * boxsize
     };
 }
 
-function saveScore(points) {
-    const data = JSON.parse(localStorage.getItem('myWebGames')) || {};
-    // ID 'snake_01' muss mit der ID in deiner games.js übereinstimmen
-    const gameId = 'snake'; 
-    
-    if (!data[gameId] || points > data[gameId].highscore) {
-        data[gameId] = { highscore: points };
-        localStorage.setItem('myWebGames', JSON.stringify(data));
+// speichert den highscore lokal im browser
+function savescore(points) {
+    const data = json.parse(localstorage.getitem('mywebgames')) || {};
+    const gameid = 'snake'; 
+
+    if (!data[gameid] || points > data[gameid].highscore) {
+        data[gameid] = { highscore: points };
+        localstorage.setitem('mywebgames', json.stringify(data));
     }
 }
 
+// --- 4. haupt-update-funktion (spiellogik) ---
 function update() {
-    ctx.fillStyle = "#1a1a1a";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // hintergrund (spielfeld) zeichnen
+    ctx.fillstyle = "#1a1a1a";
+    ctx.fillrect(0, 0, canvas.width, canvas.height);
 
-    // Schlange malen
-    snake.forEach((segment, index) => {
-        ctx.fillStyle = (index === 0) ? "#e60000" : "#800000";
-        ctx.fillRect(segment.x, segment.y, boxSize, boxSize);
-        ctx.strokeStyle = "#1a1a1a";
-        ctx.strokeRect(segment.x, segment.y, boxSize, boxSize);
+    // schlange zeichnen
+    snake.foreach((segment, index) => {
+        // kopf ist hellrot, der körper dunkelrot
+        ctx.fillstyle = (index === 0) ? "#e60000" : "#800000";
+        ctx.fillrect(segment.x, segment.y, boxsize, boxsize);
+        ctx.strokestyle = "#1a1a1a";
+        ctx.strokerect(segment.x, segment.y, boxsize, boxsize);
     });
 
-    // Apfel malen
-    ctx.fillStyle = "#ffcc00";
-    ctx.fillRect(apple.x, apple.y, boxSize, boxSize);
+    // apfel zeichnen
+    ctx.fillstyle = "#ffcc00";
+    ctx.fillrect(apple.x, apple.y, boxsize, boxsize);
 
-    let headX = snake[0].x;
-    let headY = snake[0].y;
+    // aktuelle kopfposition auslesen
+    let headx = snake[0].x;
+    let heady = snake[0].y;
 
-    if (direction === "LEFT") headX -= boxSize;
-    if (direction === "UP") headY -= boxSize;
-    if (direction === "RIGHT") headX += boxSize;
-    if (direction === "DOWN") headY += boxSize;
+    // bewegung berechnen
+    if (direction === "left") headx -= boxsize;
+    if (direction === "up") heady -= boxsize;
+    if (direction === "right") headx += boxsize;
+    if (direction === "down") heady += boxsize;
 
-    // Apfel gefressen?
-    if (headX === apple.x && headY === apple.y) {
+    // kollisions-check: apfel gefressen?
+    if (headx === apple.x && heady === apple.y) {
         score++;
-        scoreDisplay.innerText = score;
-        apple = spawnApple();
+        scoredisplay.innertext = score;
+        apple = spawnapple();
     } else {
+        // falls kein apfel gefressen wurde, muss das letzte glied entfernt werden
         snake.pop();
     }
 
-    let newHead = { x: headX, y: headY };
+    let newhead = { x: headx, y: heady };
 
-    // Kollision Wand oder sich selbst
-    if (headX < 0 || headX >= canvas.width || headY < 0 || headY >= canvas.height || 
-        snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
-        clearInterval(gameLoop);
-        saveScore(score);
-        alert("Spiel vorbei! Score: " + score);
+    // kollisions-check: wand (selbst-kollision ist erlaubt/deaktiviert)
+    if (headx < 0 || headx >= canvas.width || heady < 0 || heady >= canvas.height) {
+        clearinterval(gameloop);
+        savescore(score);
+        alert("spiel vorbei! score: " + score);
         location.reload();
     }
 
-    snake.unshift(newHead);
+    // den neuen kopf vorne hinzufügen
+    snake.unshift(newhead);
 }
 
-const gameLoop = setInterval(update, 120);
+// --- 5. spielstart ---
+const gameloop = setinterval(update, speed);
