@@ -14,6 +14,14 @@ const GAMES_DATA = [
     icon: "pictures/icons/tetris.png", // Bildpfad anpassen
     btn_color: "#9b59b6" // Lila
 },
+{
+    id: "tower-defense",
+    game_name: "Tower Defense",
+    path: "games/tower-defense/index.html",
+    icon: "pictures/icons/tower.png",
+    btn_color: "#27ae60"
+}
+
     /*{
         id: "beispiel",
         game_name: "Beispiel",
