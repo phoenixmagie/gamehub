@@ -40,7 +40,7 @@ function spawnApple() {
 function saveScore(points) {
     const data = JSON.parse(localStorage.getItem('myWebGames')) || {};
     // ID 'snake_01' muss mit der ID in deiner games.js übereinstimmen
-    const gameId = 'snake_01'; 
+    const gameId = 'snake'; 
     
     if (!data[gameId] || points > data[gameId].highscore) {
         data[gameId] = { highscore: points };
