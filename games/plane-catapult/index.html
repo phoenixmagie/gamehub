@@ -2,59 +2,30 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Epic Plane Evolution</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic Plane Evolution 3D</title>
     <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+    </script>
 </head>
 <body>
-    <div id="game-viewport">
-        <div id="dist-meter">
-            <div id="finish-flag">🏁</div>
-            <div id="dist-plane-icon">✈️</div>
-        </div>
-
-        <div id="world"></div>
-
-        <div id="plane-container">
-            <div id="plane">
-                <div class="body"></div>
-                <div class="cockpit"></div>
-                <div class="wings"></div>
-                <div class="tail"></div>
-            </div>
-        </div>
-
-        <div id="hud">
-            <div class="stat-box">💰 <span id="money-display">0</span></div>
-            <div class="stat-box">📏 <span id="dist-display">0m</span></div>
-        </div>
-
-        <div id="upgrade-menu">
-            <div class="hangar-title">Zum Fliegen tippen</div>
-            
+    <div id="ui-layer">
+        <div id="hud">💰 <span id="money">0</span> | 📏 <span id="dist">0</span>m</div>
+        
+        <div id="menu">
+            <h1>EVOLVE YOUR RIDE</h1>
             <div class="shop">
-                <div class="card" onclick="buyUpgrade('power')">
-                    <div class="card-lvl" id="lvl-power">1</div>
-                    <div class="card-icon">🎯</div>
-                    <div class="card-name">SCHLEUDER</div>
-                    <button class="card-btn"><span id="p-power">100</span> $</button>
-                </div>
-                <div class="card" onclick="buyUpgrade('plane')">
-                    <div class="card-lvl" id="lvl-plane">1</div>
-                    <div class="card-icon">🛩️</div>
-                    <div class="card-name">FLUGZEUG</div>
-                    <button class="card-btn"><span id="p-plane">100</span> $</button>
-                </div>
-                <div class="card" onclick="buyUpgrade('money')">
-                    <div class="card-lvl" id="lvl-money">1</div>
-                    <div class="card-icon">💸</div>
-                    <div class="card-name">EINKOMMEN</div>
-                    <button class="card-btn"><span id="p-mon">100</span> $</button>
-                </div>
+                <div class="card" onclick="upgrade('engine')">🚀 MOTOR<br><span id="cost-eng">100</span>$</div>
+                <div class="card" onclick="upgrade('wings')">🛩️ FLÜGEL<br><span id="cost-win">150</span>$</div>
             </div>
-            <button class="big-start-btn" onclick="resetFlight()">START</button>
+            <button id="start-btn">FLIEGEN!</button>
         </div>
     </div>
-    <script src="game.js"></script>
+    <script type="module" src="game.js"></script>
 </body>
 </html>
