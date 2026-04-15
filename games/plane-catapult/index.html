@@ -3,56 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plane Catapult 3D - Ultimate</title>
+    <title>Epic Plane Evolution</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-viewport">
+        <div id="lvl-tag">LEVEL 1</div>
+        
         <div id="world"></div>
 
-        <div id="slingshot">
-            <div class="pole left"></div>
-            <div class="pole right"></div>
-        </div>
-
         <div id="plane-container">
-            <div id="plane">
+            <div id="plane" class="lvl-1">
                 <div class="body"></div>
                 <div class="cockpit"></div>
                 <div class="wings"></div>
                 <div class="engines"></div>
-                <div class="tail-fin"></div>
+                <div class="tail"></div>
             </div>
         </div>
 
         <div id="hud">
-            <div id="money-display">0 €</div>
+            <div id="money-display">0 $</div>
             <div id="dist-display">0 m</div>
         </div>
 
         <div id="upgrade-menu" class="hidden">
-            <h2 id="status-title">Flug beendet</h2>
+            <h1 class="evo-title">EVOLVE!</h1>
             <p id="flight-info"></p>
-            
-            <div class="evo-box">
-                <span>Flugzeug Level: <b id="lvl-num">1</b></span>
-                <div class="lvl-bar"><div id="lvl-progress"></div></div>
-            </div>
-
             <div class="shop">
                 <div class="item" onclick="buyUpgrade('plane')">
-                    🚀 Evolve <br><b id="p-plane">250€</b>
+                    🚀 FLUGZEUG<br><span id="p-plane">200$</span>
                 </div>
-                <div class="item" onclick="buyUpgrade('catapult')">
-                    ⚓ Power <br><b id="p-cat">150€</b>
-                </div>
-                <div class="item" onclick="buyUpgrade('money')">
-                    💰 Bonus <br><b id="p-mon">100€</b>
+                <div class="item" onclick="buyUpgrade('power')">
+                    ⚓ POWER<br><span id="p-power">150$</span>
                 </div>
             </div>
-            <button onclick="resetFlight()">Nächster Start</button>
-            <br>
-            <a href="../../index.html" class="back-link" onclick="save()">Zum Hub</a>
+            <button class="start-btn" onclick="resetFlight()">NÄCHSTER START</button>
         </div>
     </div>
     <script src="game.js"></script>
