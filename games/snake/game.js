@@ -1,7 +1,7 @@
 // ==========================================
 // einstellung: speed
 // ==========================================
-const speed = 1000000; // millisekunden pro schritt (z. b. 100 = schnell, 300 = langsam)
+const speed = 1000; // millisekunden pro schritt (z. b. 100 = schnell, 300 = langsam)
 
 // --- 1. grund-setup ---
 const canvas = document.getelementbyid("snakecanvas");
