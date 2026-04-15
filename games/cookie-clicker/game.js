@@ -9,7 +9,7 @@ let upgrades = {
 // Spiel laden
 function loadGame() {
     const saved = JSON.parse(localStorage.getItem('myWebGames')) || {};
-    const data = saved['cookie_clicker_01']; // ID aus deiner games.js
+    const data = saved['cookie_clicker']; // ID aus deiner games.js
 
     if (data && data.fullState) {
         cookies = data.fullState.cookies;
