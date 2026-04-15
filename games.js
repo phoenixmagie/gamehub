@@ -26,7 +26,7 @@ const GAMES_DATA = [
         id: "snake",
         game_name: "Snake",
         icon: "pictures/icons/snake.png", // Pfad zu deinem Icon
-        path: "snake/index.html",     // Pfad zu deiner Snake-index.html
+        path: "games/snake/index.html",     // Pfad zu deiner Snake-index.html
         btn_color: "#e60000"
     },
 
