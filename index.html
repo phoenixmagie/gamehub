@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My GameHub</title>
+    <style>
+        :root {
+            --main-red: #e60000;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        h1 { color: var(--main-red); font-size: 3rem; margin-bottom: 20px; }
+
+        #searchBar {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            border-radius: 25px;
+            border: 2px solid var(--main-red);
+            background: #333;
+            color: white;
+            outline: none;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+            border-bottom: 4px solid var(--main-red);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .game-card img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            object-fit: contain;
+        }
+
+        .game-card h3 { margin: 10px 0; font-size: 1.2rem; }
+
+        .play-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .play-btn:hover { opacity: 0.8; }
+
+        .highscore-text {
+            display: block;
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>GAME<span style="color:white">HUB</span></h1>
+    <input type="text" id="searchBar" placeholder="Spiel suchen..." onkeyup="filterGames()">
+</header>
+
+<div class="game-grid" id="gameGrid">
+    </div>
+
+<script src="games.js"></script>
+<script>
+    function renderGames(filter = "") {
+        const grid = document.getElementById('gameGrid');
+        grid.innerHTML = "";
+
+        // LocalStorage laden
+        const storedData = JSON.parse(localStorage.getItem('myWebGames')) || {};
+
+        const filteredGames = GAMES_DATA.filter(game => 
+            game.game_name.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        filteredGames.forEach(game => {
+            const highscore = storedData[game.id]?.highscore || 0;
+            
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <img src="${game.icon}" alt="${game.game_name}" onerror="this.src='https://via.placeholder.com/80?text=Game'">
+                <h3>${game.game_name}</h3>
+                <a href="${game.path}" class="play-btn" style="background-color: ${game.btn_color}">Spielen</a>
+                <span class="highscore-text">Best: ${highscore}</span>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterGames() {
+        const query = document.getElementById('searchBar').value;
+        renderGames(query);
+    }
+
+    // Initiales Rendern
+    renderGames();
+</script>
+
+</body>
+</html>
