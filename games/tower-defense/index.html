@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tower Defense</title>
+    <title>Tower Defense Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,12 +12,26 @@
             💰 <span id="money">200</span> | ❤️ <span id="lives">20</span> | Welle: <span id="wave">1</span>
         </div>
         <div class="shop">
-            <button class="tower-btn" onclick="selectTower('basic')">Turm (50€)</button>
-            <button class="tower-btn" onclick="selectTower('sniper')">Sniper (100€)</button>
+            <button class="tower-btn" id="btn-basic" onclick="selectTower('basic')">Turm (50€)</button>
+            <button class="tower-btn" id="btn-sniper" onclick="selectTower('sniper')">Sniper (100€)</button>
             <a href="../../index.html" class="exit-btn">Hub</a>
         </div>
     </div>
+
     <canvas id="gameCanvas"></canvas>
+
+    <div id="game-over-screen" class="hidden">
+        <h1>GAME OVER</h1>
+        <p>Die Basis wurde überrannt!</p>
+        <div class="final-stats">
+            Wellen überlebt: <span id="final-wave">0</span><br>
+            Bester Rekord: <span id="high-score">0</span>
+        </div>
+        <button class="retry-btn" onclick="restartGame()">REVANCHE</button>
+        <br>
+        <a href="../../index.html" class="exit-link">Zum Hub</a>
+    </div>
+
     <script src="game.js"></script>
 </body>
 </html>
