@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#e60000">
-    
+
     <title>Phoenixmagie | Game Hub</title>
     <style>
         :root {
@@ -83,7 +83,6 @@
         /* Game Grid */
         .game-grid {
             display: grid;
-            /* Flexibles Grid für alle Geräte */
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 25px;
         }
@@ -102,7 +101,6 @@
             min-height: 320px;
         }
 
-        /* Hover Effekte für PC */
         @media (hover: hover) {
             .game-card:hover {
                 transform: translateY(-12px);
@@ -151,9 +149,6 @@
             font-weight: 500;
         }
 
-        /* RESPONSIVE ANPASSUNGEN */
-
-        /* Tablet (max 992px) */
         @media (max-width: 992px) {
             .game-grid {
                 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -163,13 +158,11 @@
             .game-card img { width: 80px; height: 80px; }
         }
 
-        /* Smartphone (max 480px) */
         @media (max-width: 480px) {
             header { padding: 30px 5px; }
             .container { padding: 12px; }
 
             .game-grid {
-                /* Exakt 2 Spalten auf dem Handy */
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
@@ -214,26 +207,22 @@
     </header>
 
     <main class="game-grid" id="gameGrid">
-        </main>
+    </main>
 </div>
 
 <script src="games.js"></script>
 
 <script>
-    // Die Render-Funktion für den Hub
     function renderHub(filterText = "") {
         const grid = document.getElementById('gameGrid');
         grid.innerHTML = "";
 
-        // Highscores aus dem LocalStorage laden (Key: myWebGames)
         const allData = JSON.parse(localStorage.getItem('myWebGames')) || {};
 
-        // Spiele filtern
         const filtered = GAMES_DATA.filter(game => 
             game.game_name.toLowerCase().includes(filterText.toLowerCase())
         );
 
-        // Kacheln erstellen
         filtered.forEach(game => {
             const highscore = allData[game.id]?.highscore || 0;
 
@@ -243,27 +232,22 @@
                 <img src="${game.icon}" alt="${game.game_name}" onerror="this.src='https://via.placeholder.com/100/333/e60000?text=?'">
                 <h3>${game.game_name}</h3>
                 <a href="${game.path}" class="play-btn" style="background-color: ${game.btn_color}">Spielen</a>
->
             `;
             grid.appendChild(card);
         });
 
-        // Falls kein Spiel gefunden wurde
         if (filtered.length === 0) {
             grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666;">Kein Spiel unter "${filterText}" gefunden.</p>`;
         }
     }
 
-    // Suchfunktion
     function filterGames() {
         const input = document.getElementById('searchBar');
         renderHub(input.value);
     }
 
-    // Beim Start einmal alles laden
     window.onload = () => renderHub();
 
-    // Service Worker Registrierung
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
