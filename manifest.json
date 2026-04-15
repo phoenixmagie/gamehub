@@ -2,7 +2,7 @@
   "id": "gameshub",
   "name": "Phoenixmagie Gameshub",
   "short_name": "Gameshub",
-  "description": "Dien Hub für viele Games!",
+  "description": "Dein Hub für viele Games!",
   "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
