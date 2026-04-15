@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Plane Catapult 3D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-viewport">
+        <div id="world"></div>
+
+        <div id="slingshot">
+            <div class="pole left"></div>
+            <div class="pole right"></div>
+            <div id="rubber-band"></div>
+        </div>
+
+        <div id="plane-container">
+            <div id="plane">
+                <div class="body"></div>
+                <div class="wing-l"></div>
+                <div class="wing-r"></div>
+                <div class="tail"></div>
+                <div class="propeller" id="propeller"></div>
+            </div>
+        </div>
+
+        <div id="hud">
+            <div id="stats">
+                <span id="dist-display">0m</span><br>
+                <span id="money-display">0€</span>
+            </div>
+            <div id="speed-indicator">
+                <div id="speed-bar"></div>
+            </div>
+        </div>
+
+        <div id="upgrade-menu" class="hidden">
+            <h2 id="end-status">Flug beendet!</h2>
+            <p id="flight-report"></p>
+            <div class="shop-grid">
+                <div class="shop-item" onclick="buyUpgrade('money')">
+                    <span>Geld-Bonus</span>
+                    <b id="price-money">100€</b>
+                </div>
+                <div class="shop-item" onclick="buyUpgrade('plane')">
+                    <span>Flugzeug (Handling)</span>
+                    <b id="price-plane">250€</b>
+                </div>
+                <div class="shop-item" onclick="buyUpgrade('catapult')">
+                    <span>Katapult (Power)</span>
+                    <b id="price-catapult">150€</b>
+                </div>
+            </div>
+            <button id="restart-btn" onclick="resetFlight()">Nächster Start</button>
+            <br>
+            <a href="../../index.html" class="back-link" onclick="save()">Zum Hub</a>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
