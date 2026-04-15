@@ -1,58 +1,70 @@
 // ==========================================
-// einstellung: speed & physik
+// Einstellung: Speed & Physik
 // ==========================================
-const speed = 20;    // millisekunden pro frame
-const gravity = 0.25; // schwerkraft
-const jump = -4.5;   // sprungstärke
+const speed = 20;    
+const gravity = 0.25; 
+const jump = -4.5;   
 
-// --- 1. setup ---
+// --- 1. Setup ---
 const canvas = document.getElementById("birdCanvas");
 const ctx = canvas.getContext("2d");
 const scoredisplay = document.getElementById("currentScore");
 
 let score = 0;
-let birdy = 200;     // vogel höhe
-let birdv = 0;       // vogel geschwindigkeit
-let pipes = [];      // hindernis-liste
-let gap = 130;       // lücke zwischen den röhren
+let birdy = 200;     
+let birdv = 0;       
+let pipes = [];      
+let gap = 130;       
 
-// erste röhre erstellen
-pipes[0] = { x: canvas.width, y: 50 };
+pipes[0] = { x: canvas.width, y: 100 };
 
-// --- 2. steuerung ---
-document.addEventListener("keydown", flap);
-if(document.getElementById("btnJump")) document.getElementById("btnJump").onclick = flap;
+// --- 2. Steuerung ---
+document.addEventListener("keydown", (e) => {
+    if (e.code === "Space" || e.keyCode === 32 || e.keyCode === 38) flap();
+});
 
-function flap() {
-    birdv = jump; // vogel bekommt schwung nach oben
+if (document.getElementById("btnJump")) {
+    document.getElementById("btnJump").onclick = flap;
 }
 
-// --- 3. spiellogik ---
+function flap() {
+    birdv = jump; 
+}
+
+// --- 3. Highscore speichern ---
+function savescore(points) {
+    const data = JSON.parse(localStorage.getItem('myWebGames')) || {};
+    const gameid = 'flappybird'; 
+
+    if (!data[gameid] || points > data[gameid].highscore) {
+        data[gameid] = { highscore: points };
+        localStorage.setItem('myWebGames', JSON.stringify(data));
+    }
+}
+
+// --- 4. Haupt-Loop ---
 function update() {
-    // hintergrund (himmel)
+    // Hintergrund
     ctx.fillStyle = "#4ec0ca";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // vogel bewegen (physik)
+    // Vogel-Physik
     birdv += gravity;
     birdy += birdv;
 
-    // vogel zeichnen
+    // Vogel zeichnen
     ctx.fillStyle = "#ffcc00";
     ctx.fillRect(50, birdy, 25, 25);
 
-    // hindernisse verarbeiten
     for (let i = 0; i < pipes.length; i++) {
-        ctx.fillStyle = "#2ecc71"; // röhrenfarbe (grün)
+        ctx.fillStyle = "#2ecc71";
         
-        // obere röhre
+        // Röhren zeichnen
         ctx.fillRect(pipes[i].x, 0, 50, pipes[i].y);
-        // untere röhre
         ctx.fillRect(pipes[i].x, pipes[i].y + gap, 50, canvas.height);
 
-        pipes[i].x -= 2; // röhre nach links schieben
+        pipes[i].x -= 2;
 
-        // neue röhre generieren
         if (pipes[i].x === 120) {
             pipes.push({
                 x: canvas.width,
@@ -60,23 +72,47 @@ function update() {
             });
         }
 
-        // kollisionsprüfung (röhren, boden oder decke)
-        if (50 + 25 > pipes[i].x && 50 < pipes[i].x + 50 && 
-           (birdy < pipes[i].y || birdy + 25 > pipes[i].y + gap) ||
-            birdy + 25 > canvas.height || birdy < 0) {
-            location.reload(); 
+        // --- STRENGE KOLLISIONSPRÜFUNG ---
+        let birdRight = 50 + 25;
+        let birdLeft = 50;
+        let birdBottom = birdy + 25;
+        let birdTop = birdy;
+        
+        let pipeRight = pipes[i].x + 50;
+        let pipeLeft = pipes[i].x;
+        let upperPipeBottom = pipes[i].y;
+        let lowerPipeTop = pipes[i].y + gap;
+
+        // Prüfung: Ist der Vogel horizontal auf Höhe der Röhre?
+        if (birdRight > pipeLeft && birdLeft < pipeRight) {
+            // Berührt er die obere oder die untere Röhre?
+            if (birdTop < upperPipeBottom || birdBottom > lowerPipeTop) {
+                endGame();
+                return;
+            }
         }
 
-        // punkte zählen
+        // Prüfung: Boden oder Decke berührt?
+        if (birdBottom >= canvas.height || birdTop <= 0) {
+            endGame();
+            return;
+        }
+
+        // Punkte zählen
         if (pipes[i].x === 40) {
             score++;
-            if(scoredisplay) scoredisplay.innerText = score;
+            if (scoredisplay) scoredisplay.innerText = score;
         }
     }
 
-    // alte röhren entfernen (performance)
     if (pipes.length > 5) pipes.shift();
 }
 
-// spiel starten
+function endGame() {
+    clearInterval(gameloop);
+    savescore(score);
+    alert("Spiel vorbei! Dein Score: " + score);
+    location.reload();
+}
+
 const gameloop = setInterval(update, speed);
