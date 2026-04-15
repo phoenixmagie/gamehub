@@ -1,104 +1,92 @@
 :root {
-    --sky-blue: #87CEEB;
-    --grass-green: #4CAF50;
-    --main-red: #e60000;
+    --sky: #87CEEB;
+    --grass: #4CAF50;
+    --city: #555;
+    --accent: #3498db;
 }
 
-* {
-    box-sizing: border-box;
-    touch-action: none;
-    user-select: none;
-}
-
-body, html {
-    margin: 0; padding: 0; width: 100%; height: 100%;
-    overflow: hidden; background: var(--sky-blue);
-    font-family: 'Segoe UI', sans-serif;
-}
+* { box-sizing: border-box; touch-action: none; user-select: none; }
+body, html { margin: 0; height: 100%; overflow: hidden; background: var(--sky); font-family: 'Arial Black', sans-serif; }
 
 #game-viewport {
     position: relative; width: 100%; height: 100%;
-    perspective: 1000px;
+    perspective: 1500px; /* Die Stärke des 3D-Effekts */
+}
+
+/* 3D WELT */
+#world-container {
+    position: absolute; width: 100%; height: 100%;
+    transform-style: preserve-3d;
 }
 
 #world {
-    position: absolute; bottom: 0; width: 2000px; height: 100px;
-    background: linear-gradient(to bottom, #4CAF50, #2E7D32);
-    border-top: 4px solid #1B5E20;
+    position: absolute; bottom: -600px; left: -50%;
+    width: 200vw; height: 1500px;
+    background: var(--grass);
+    transform: rotateX(70deg); /* Kippt den Boden nach hinten */
+    transform-origin: center bottom;
+    transition: background 1.5s;
 }
 
-/* 3D Flugzeug */
+/* FLUGZEUG 3D MODELL */
 #plane-container {
-    position: absolute; bottom: 150px; left: 100px;
-    width: 60px; height: 20px;
+    position: absolute; bottom: 20%; left: 15%;
+    width: 100px; height: 30px;
     transform-style: preserve-3d;
-    z-index: 10;
+    z-index: 100;
 }
 
 #plane {
     position: relative; width: 100%; height: 100%;
     transform-style: preserve-3d;
-    transition: filter 0.3s;
+    transition: transform 0.1s linear, filter 0.3s;
 }
 
-.body {
-    width: 60px; height: 20px; background: #eee;
-    border-radius: 50% 5px 5px 50%; border: 1px solid #999;
+.body { 
+    width: 100px; height: 25px; background: white; 
+    border-radius: 50% 10px 10px 50%; 
+    border: 1px solid #ccc; transform: translateZ(5px);
 }
 
-.wing-l, .wing-r {
-    position: absolute; width: 40px; height: 15px;
-    background: #ddd; top: 2px; left: 10px; border: 1px solid #888;
-}
-.wing-l { transform: rotateX(90deg) translateZ(20px); }
-.wing-r { transform: rotateX(90deg) translateZ(-20px); }
-
-.tail {
-    position: absolute; width: 15px; height: 15px;
-    background: #ccc; right: 0; top: -5px;
-    transform: rotateY(90deg);
+.cockpit {
+    position: absolute; top: 5px; left: 5px; width: 20px; height: 10px;
+    background: #333; border-radius: 5px; transform: translateZ(12px);
 }
 
-.propeller {
-    position: absolute; width: 2px; height: 30px;
-    background: #333; left: 0; top: -5px;
-    animation: spin 0.1s linear infinite;
-    display: none; /* Sichtbar nach Upgrade */
+/* Evolution Stufen */
+.wings, .tail-fin, .engines { display: none; position: absolute; background: white; border: 1px solid #ccc; }
+
+/* Level 5: Kleine Flügel */
+#plane.lvl-5 .wings, #plane.lvl-10 .wings, #plane.lvl-20 .wings { 
+    display: block; width: 60px; height: 20px; top: 2px; left: 30px; 
+    background: #eee; transform: rotateX(90deg) translateZ(0); 
 }
 
-@keyframes spin { from { transform: rotateX(0deg); } to { transform: rotateX(360deg); } }
+/* Level 10: Große Blaue Flügel (wie im Bild) */
+#plane.lvl-10 .wings, #plane.lvl-20 .wings { 
+    width: 100px; height: 25px; background: var(--accent); left: 10px;
+}
 
-/* Slingshot */
-#slingshot { position: absolute; bottom: 100px; left: 80px; width: 40px; height: 80px; }
-.pole { position: absolute; width: 10px; height: 70px; background: #5d3a1a; bottom: 0; border-radius: 5px; }
-.right { left: 40px; }
+/* Level 20: Heckflosse & Triebwerke */
+#plane.lvl-20 .tail-fin { display: block; width: 20px; height: 25px; right: 0; top: -10px; transform: rotateY(90deg); }
+#plane.lvl-20 .engines { 
+    display: block; width: 25px; height: 15px; border-radius: 5px; 
+    background: #444; top: 25px; left: 40px; transform: translateZ(-10px);
+}
 
-/* UI */
-#hud { position: absolute; top: 20px; left: 20px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-#money-display { color: #FFD700; font-size: 1.5rem; font-weight: bold; }
+/* HUD & MENÜ */
+#hud { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; color: white; }
+#money-display { color: #FFD700; font-size: 24px; }
 
-#speed-indicator { position: absolute; top: 20px; right: 20px; width: 15px; height: 150px; background: rgba(0,0,0,0.3); border: 2px solid white; }
-#speed-bar { position: absolute; bottom: 0; width: 100%; background: var(--main-red); height: 0%; transition: height 0.1s; }
-
-/* Menü */
 #upgrade-menu {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(20,20,20,0.95); padding: 30px; border-radius: 25px;
-    text-align: center; color: white; min-width: 320px; z-index: 100;
-    border: 2px solid var(--main-red);
+    background: rgba(0,0,0,0.9); padding: 30px; border-radius: 20px;
+    color: white; text-align: center; border: 4px solid var(--accent);
 }
 
-.shop-grid { display: grid; gap: 10px; margin: 20px 0; }
-.shop-item {
-    background: #333; padding: 15px; border-radius: 12px;
-    display: flex; justify-content: space-between; cursor: pointer; transition: 0.2s;
-}
-.shop-item:hover { background: #444; border-color: var(--main-red); }
+.shop { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+.item { background: #333; padding: 10px; border-radius: 10px; cursor: pointer; }
+.item:hover { background: var(--accent); }
 
-button {
-    background: var(--main-red); color: white; border: none;
-    padding: 12px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;
-}
-
+button { background: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 .hidden { display: none !important; }
-.back-link { color: #888; text-decoration: none; display: inline-block; margin-top: 15px; }
