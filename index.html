@@ -2,137 +2,263 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My GameHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phoenixmagie | Game Hub</title>
     <style>
         :root {
             --main-red: #e60000;
-            --dark-bg: #1a1a1a;
-            --card-bg: #2d2d2d;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-white: #ffffff;
+            --text-gray: #aaaaaa;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--dark-bg);
-            color: white;
+            color: var(--text-white);
             margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Container für zentrierten Inhalt */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
         }
 
+        /* Header Bereich */
         header {
             text-align: center;
-            padding: 40px 0;
+            padding: 40px 10px;
         }
 
-        h1 { color: var(--main-red); font-size: 3rem; margin-bottom: 20px; }
+        h1 {
+            font-size: clamp(2rem, 10vw, 4rem);
+            margin: 0 0 20px 0;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        h1 span {
+            color: var(--main-red);
+        }
+
+        /* Suchleiste */
+        .search-container {
+            margin-bottom: 40px;
+        }
 
         #searchBar {
             width: 100%;
-            max-width: 500px;
-            padding: 12px 20px;
+            max-width: 600px;
+            padding: 16px 25px;
             font-size: 1.1rem;
-            border-radius: 25px;
+            border-radius: 50px;
             border: 2px solid var(--main-red);
-            background: #333;
+            background: var(--input-bg);
             color: white;
             outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
+        #searchBar:focus {
+            box-shadow: 0 0 20px rgba(230, 0, 0, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* Game Grid */
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            /* Flexibles Grid für alle Geräte */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 25px;
-            max-width: 1200px;
-            margin: 40px auto;
         }
 
+        /* Game Card */
         .game-card {
             background: var(--card-bg);
-            border-radius: 15px;
+            border-radius: 24px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s;
-            border-bottom: 4px solid var(--main-red);
+            border-bottom: 5px solid var(--main-red);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 320px;
         }
 
-        .game-card:hover {
-            transform: translateY(-10px);
+        /* Hover Effekte für PC */
+        @media (hover: hover) {
+            .game-card:hover {
+                transform: translateY(-12px);
+                background: #222;
+            }
         }
 
         .game-card img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-            object-fit: contain;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px auto;
+            border-radius: 20px;
+            object-fit: cover;
+            background: #333;
         }
 
-        .game-card h3 { margin: 10px 0; font-size: 1.2rem; }
+        .game-card h3 {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            font-weight: 600;
+        }
 
         .play-btn {
-            display: inline-block;
-            padding: 10px 20px;
+            display: block;
+            width: 100%;
+            padding: 14px 0;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 12px;
             font-weight: bold;
-            transition: opacity 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+            transition: filter 0.2s ease;
         }
 
-        .play-btn:hover { opacity: 0.8; }
+        .play-btn:active {
+            transform: scale(0.95);
+        }
 
         .highscore-text {
             display: block;
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        /* RESPONSIVE ANPASSUNGEN */
+
+        /* Tablet (max 992px) */
+        @media (max-width: 992px) {
+            .game-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 20px;
+            }
+            .game-card { min-height: 280px; }
+            .game-card img { width: 80px; height: 80px; }
+        }
+
+        /* Smartphone (max 480px) */
+        @media (max-width: 480px) {
+            header { padding: 30px 5px; }
+            .container { padding: 12px; }
+            
+            .game-grid {
+                /* Exakt 2 Spalten auf dem Handy */
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            .game-card {
+                padding: 15px 10px;
+                min-height: 240px;
+                border-radius: 18px;
+            }
+            
+            .game-card img {
+                width: 60px;
+                height: 60px;
+                border-radius: 15px;
+            }
+            
+            .game-card h3 {
+                font-size: 0.95rem;
+                margin: 5px 0 10px 0;
+            }
+            
+            .play-btn {
+                padding: 10px 0;
+                font-size: 0.8rem;
+            }
+            
+            .highscore-text {
+                font-size: 0.75rem;
+                margin-top: 8px;
+            }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>GAME<span style="color:white">HUB</span></h1>
-    <input type="text" id="searchBar" placeholder="Spiel suchen..." onkeyup="filterGames()">
-</header>
+<div class="container">
+    <header>
+        <h1><span>GAME</span>HUB</h1>
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Spiel suchen..." onkeyup="filterGames()">
+        </div>
+    </header>
 
-<div class="game-grid" id="gameGrid">
-    </div>
+    <main class="game-grid" id="gameGrid">
+        </main>
+</div>
 
 <script src="games.js"></script>
+
 <script>
-    function renderGames(filter = "") {
+    // Die Render-Funktion für den Hub
+    function renderHub(filterText = "") {
         const grid = document.getElementById('gameGrid');
         grid.innerHTML = "";
 
-        // LocalStorage laden
-        const storedData = JSON.parse(localStorage.getItem('myWebGames')) || {};
+        // Highscores aus dem LocalStorage laden (Key: myWebGames)
+        const allData = JSON.parse(localStorage.getItem('myWebGames')) || {};
 
-        const filteredGames = GAMES_DATA.filter(game => 
-            game.game_name.toLowerCase().includes(filter.toLowerCase())
+        // Spiele filtern
+        const filtered = GAMES_DATA.filter(game => 
+            game.game_name.toLowerCase().includes(filterText.toLowerCase())
         );
 
-        filteredGames.forEach(game => {
-            const highscore = storedData[game.id]?.highscore || 0;
+        // Kacheln erstellen
+        filtered.forEach(game => {
+            const highscore = allData[game.id]?.highscore || 0;
             
             const card = document.createElement('div');
             card.className = 'game-card';
             card.innerHTML = `
-                <img src="${game.icon}" alt="${game.game_name}" onerror="this.src='https://via.placeholder.com/80?text=Game'">
+                <img src="${game.icon}" alt="${game.game_name}" onerror="this.src='https://via.placeholder.com/100/333/e60000?text=?'">
                 <h3>${game.game_name}</h3>
                 <a href="${game.path}" class="play-btn" style="background-color: ${game.btn_color}">Spielen</a>
                 <span class="highscore-text">Best: ${highscore}</span>
             `;
             grid.appendChild(card);
         });
+
+        // Falls kein Spiel gefunden wurde
+        if (filtered.length === 0) {
+            grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #666;">Kein Spiel unter "${filterText}" gefunden.</p>`;
+        }
     }
 
+    // Suchfunktion
     function filterGames() {
-        const query = document.getElementById('searchBar').value;
-        renderGames(query);
+        const input = document.getElementById('searchBar');
+        renderHub(input.value);
     }
 
-    // Initiales Rendern
-    renderGames();
+    // Beim Start einmal alles laden
+    window.onload = () => renderHub();
 </script>
 
 </body>
