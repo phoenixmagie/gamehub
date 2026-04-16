@@ -1,6 +1,6 @@
 export const layout = [
     "                                               ",
-    "                                     C       ",
+    "                                     F       ",
     "                                   ---       ",
     "                               ---           ",
     "          C        P       ---               ",
