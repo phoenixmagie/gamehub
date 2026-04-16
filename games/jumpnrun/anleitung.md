@@ -1,13 +1,15 @@
-# Level erstellen Anleitung
+# Jump 'n' Run Level Creator
 
-Um ein neues Level hinzuzufügen, folge diesen 3 Schritten:
+### Symbole im Raster:
+- `S` : **Spawnpunkt** (Hier startet der Spieler).
+- `#` : **Bodenblock** (Massiv).
+- `-` : **Plattform** (Massiv, anderes Design).
+- `F` : **Zielflagge** (Beendet das Level und schaltet das nächste frei).
+- ` ` : **Leerraum** (Luft).
 
-1. **Datei erstellen**: Erstelle im Ordner `level/` eine Datei namens `level_3.js`.
-2. **Design zeichnen**: Kopiere den Inhalt von Level 1 und ändere das `layout` Array.
-   - `#` : Fester Bodenblock
-   - `-` : Schwebende Plattform
-   - `F` : Zielflagge (Nur eine pro Level!)
-   - Leerzeichen: Luft
-3. **Registrieren**: Öffne `level/levels.js` und füge `'level_3'` zum Array hinzu.
+### Neues Level hinzufügen:
+1. Neue Datei `level_X.js` im Ordner `level/` erstellen.
+2. Code exportieren: `export const layout = [ ... ];`
+3. Die Datei in `level/levels.js` in die Liste eintragen.
 
-Das Spiel schaltet das Level automatisch in der Auswahl frei, sobald das vorherige geschafft wurde.
+**Wichtig:** Jedes Level muss ein `S` (Start) und ein `F` (Ziel) haben!
