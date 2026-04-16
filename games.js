@@ -21,7 +21,6 @@ const GAMES_DATA = [
     icon: "pictures/icons/tower-defense.png",
     btn_color: "#27ae60"
 },
-
 {
         id: "snake",
         game_name: "Snake",
@@ -35,6 +34,13 @@ const GAMES_DATA = [
     path: "games/flappy-bird/index.html",
     icon: "pictures/icons/flappy-bird.png", // Bildpfad anpassen
     btn_color: "#9b59b6" // Lila
+},
+{
+    id: "jumpnrun",
+    game_name: "Jump`n Run",
+    path: "games/jumpnrun/index.html",
+    icon: "pictures/icons/jumpnrun.png",
+    btn_color: "#35682D"
 },
 
 
