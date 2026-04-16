@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro UNO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="uno-table">
+        <div id="opponent-area" class="hand-container">
+            <div class="label">GEGNER / SPIELER 2</div>
+            <div id="opponent-cards" class="cards-flex"></div>
+        </div>
+
+        <div id="center-deck">
+            <div id="draw-pile" onclick="drawCard()">
+                <div class="card-back">UNO</div>
+                <span>Ziehen</span>
+            </div>
+            <div id="discard-pile">
+                </div>
+            <div id="status-box">
+                <h2 id="game-info">Modus wählen</h2>
+                <div id="setup-controls">
+                    <button class="menu-btn" onclick="startNewGame(true)">🤖 VS BOT</button>
+                    <button class="menu-btn" onclick="startNewGame(false)">👥 LOCAL PVP</button>
+                </div>
+                <button id="next-player-btn" class="hidden" onclick="confirmNextTurn()">
+                    NÄCHSTER SPIELER (Bereit?)
+                </button>
+            </div>
+        </div>
+
+        <div id="player-area" class="hand-container">
+            <div id="player-cards" class="cards-flex"></div>
+            <div class="label">DEINE KARTEN / SPIELER 1</div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
