@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jump 'n' Run Hub</title>
+    <title>Retro Jump 'n' Run</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,17 +15,19 @@
     </div>
 
     <div id="game-screen" class="hidden">
-        <div id="world">
-            <div id="player"></div>
+        <div id="world-container">
+            <div id="world">
+                <div id="player"></div>
+            </div>
         </div>
         
         <div id="ui">
-            <button class="ui-btn" onclick="exitToMenu()">MENU</button>
-            <div id="level-name">Level 1</div>
+            <button class="ui-btn" onclick="exitToMenu()">MENÜ</button>
+            <span id="level-display">Level 1</span>
         </div>
 
         <div id="controls">
-            <div class="left-group">
+            <div class="move-group">
                 <button id="btn-left">◀</button>
                 <button id="btn-right">▶</button>
             </div>
