@@ -1,9 +1,11 @@
 const COLORS = ['red', 'blue', 'green', 'yellow'];
 const VALUES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const SPECIALS = ['S', 'R', '+1', '+2']; 
+const WILD = 'W';
 
 let deck = [];
 let discardPile = [];
-let hands = [[], []]; // [Spieler 1, Spieler 2/Bot]
+let hands = [[], []]; 
 let currentPlayer = 0;
 let isBotMode = true;
 let waitingForConfirmation = false;
@@ -13,9 +15,14 @@ function createDeck() {
     COLORS.forEach(color => {
         VALUES.forEach(val => {
             deck.push({ color, value: val });
-            if (val !== '0') deck.push({ color, value: val }); // Jede Zahl außer 0 gibt es doppelt
+            if (val !== '0') deck.push({ color, value: val });
+        });
+        SPECIALS.forEach(spec => {
+            deck.push({ color, value: spec });
+            deck.push({ color, value: spec });
         });
     });
+    for(let i=0; i<4; i++) deck.push({ color: 'black', value: WILD });
     deck.sort(() => Math.random() - 0.5);
 }
 
@@ -24,11 +31,10 @@ function startNewGame(bot) {
     currentPlayer = 0;
     waitingForConfirmation = false;
     createDeck();
-    
     hands[0] = deck.splice(0, 7);
     hands[1] = deck.splice(0, 7);
     discardPile = [deck.splice(0, 1)[0]];
-    
+    if (discardPile[0].color === 'black') discardPile[0].color = 'red';
     document.getElementById('setup-controls').classList.add('hidden');
     render();
 }
@@ -39,11 +45,9 @@ function render() {
     const discardArea = document.getElementById('discard-pile');
     const info = document.getElementById('game-info');
 
-    // Aktuelle Karte in der Mitte
     const topCard = discardPile[discardPile.length - 1];
     discardArea.innerHTML = `<div class="card ${topCard.color}">${topCard.value}</div>`;
 
-    // Spieler 1 Karten (Unten)
     playerArea.innerHTML = "";
     hands[0].forEach((card, i) => {
         const el = createCardUI(card, (currentPlayer === 0 && !waitingForConfirmation));
@@ -51,21 +55,18 @@ function render() {
         playerArea.appendChild(el);
     });
 
-    // Spieler 2 / Bot Karten (Oben)
     opponentArea.innerHTML = "";
     hands[1].forEach((card, i) => {
-        // Im Bot-Modus immer verdeckt. Im PvP nur sichtbar, wenn Spieler 2 dran ist.
         let isVisible = (!isBotMode && currentPlayer === 1 && !waitingForConfirmation);
         const el = createCardUI(card, isVisible);
         if (!isBotMode) el.onclick = () => playCard(1, i);
         opponentArea.appendChild(el);
     });
 
-    // Status Text
     if (waitingForConfirmation) {
-        info.innerText = "BITTE WECHSELN...";
+        info.innerText = "NÄCHSTER SPIELER...";
     } else {
-        info.innerText = (isBotMode && currentPlayer === 1) ? "Bot denkt nach..." : `Spieler ${currentPlayer + 1} ist dran`;
+        info.innerText = (isBotMode && currentPlayer === 1) ? "Bot zieht..." : `Spieler ${currentPlayer + 1} ist dran`;
     }
 }
 
@@ -81,14 +82,36 @@ function createCardUI(card, isVisible) {
     return div;
 }
 
+function handleSpecialEffect(card) {
+    let nextPlayer = currentPlayer === 0 ? 1 : 0;
+
+    if (card.value === '+1') {
+        for(let i=0; i<1; i++) hands[nextPlayer].push(deck.splice(0, 1)[0]);
+        return true; 
+    }
+    if (card.value === '+2') {
+        for(let i=0; i<2; i++) hands[nextPlayer].push(deck.splice(0, 1)[0]);
+        return true; 
+    }
+    if (card.value === 'S' || card.value === 'R') {
+        return true; 
+    }
+    if (card.value === WILD) {
+        const newColor = hands[currentPlayer][0]?.color || COLORS[Math.floor(Math.random()*4)];
+        card.color = (newColor === 'black') ? 'red' : newColor;
+    }
+    return false;
+}
+
 function playCard(playerIdx, cardIdx) {
     if (currentPlayer !== playerIdx || waitingForConfirmation) return;
 
     const card = hands[playerIdx][cardIdx];
     const top = discardPile[discardPile.length - 1];
 
-    if (card.color === top.color || card.value === top.value) {
-        discardPile.push(hands[playerIdx].splice(cardIdx, 1)[0]);
+    if (card.color === top.color || card.value === top.value || card.color === 'black') {
+        const playedCard = hands[playerIdx].splice(cardIdx, 1)[0];
+        discardPile.push(playedCard);
         
         if (hands[playerIdx].length === 0) {
             alert(`SPIELER ${playerIdx + 1} GEWINNT!`);
@@ -96,16 +119,23 @@ function playCard(playerIdx, cardIdx) {
             return;
         }
 
+        const skipNext = handleSpecialEffect(playedCard);
+
         if (isBotMode) {
             if (currentPlayer === 0) {
-                currentPlayer = 1;
-                render();
-                setTimeout(botTurn, 1000);
+                if (!skipNext) {
+                    currentPlayer = 1;
+                    render();
+                    setTimeout(botTurn, 1000);
+                } else {
+                    render(); 
+                }
             }
         } else {
-            // PvP Sichtschutz aktivieren
-            waitingForConfirmation = true;
-            document.getElementById('next-player-btn').classList.remove('hidden');
+            if (!skipNext) {
+                waitingForConfirmation = true;
+                document.getElementById('next-player-btn').classList.remove('hidden');
+            }
             render();
         }
     }
@@ -114,9 +144,19 @@ function playCard(playerIdx, cardIdx) {
 function drawCard() {
     if (waitingForConfirmation) return;
     if (deck.length === 0) createDeck();
-    
     hands[currentPlayer].push(deck.splice(0, 1)[0]);
-    render();
+    
+    if (isBotMode) {
+        if (currentPlayer === 0) {
+            currentPlayer = 1;
+            render();
+            setTimeout(botTurn, 1000);
+        }
+    } else {
+        waitingForConfirmation = true;
+        document.getElementById('next-player-btn').classList.remove('hidden');
+        render();
+    }
 }
 
 function confirmNextTurn() {
@@ -128,19 +168,28 @@ function confirmNextTurn() {
 
 function botTurn() {
     const top = discardPile[discardPile.length - 1];
-    const playableIdx = hands[1].findIndex(c => c.color === top.color || c.value === top.value);
+    const playableIdx = hands[1].findIndex(c => c.color === top.color || c.value === top.value || c.color === 'black');
 
     if (playableIdx !== -1) {
+        const card = hands[1][playableIdx];
         discardPile.push(hands[1].splice(playableIdx, 1)[0]);
+        const skipNext = handleSpecialEffect(card);
+        
+        if (hands[1].length === 0) {
+            alert("DER BOT GEWINNT!");
+            location.reload();
+            return;
+        }
+
+        if (skipNext) {
+            setTimeout(botTurn, 1000);
+        } else {
+            currentPlayer = 0;
+            render();
+        }
     } else {
         if (deck.length === 0) createDeck();
         hands[1].push(deck.splice(0, 1)[0]);
-    }
-
-    if (hands[1].length === 0) {
-        alert("DER BOT GEWINNT!");
-        location.reload();
-    } else {
         currentPlayer = 0;
         render();
     }
