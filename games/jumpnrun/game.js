@@ -2,144 +2,146 @@ import { levels } from './level/levels.js';
 
 let currentLvlIndex = 0;
 let unlocked = parseInt(localStorage.getItem('jumper_unlocked')) || 1;
+let coins = 0;
+let playerLives = 3;
+let activeCheckpoint = null;
+let spawnPoint = { x: 50, y: 50 };
+let animationId;
 
 const world = document.getElementById('world');
-const player = document.getElementById('player');
 const gameScreen = document.getElementById('game-screen');
 const menuContainer = document.getElementById('menu-container');
-
-// Physik-Setup
-let pX = 0, pY = 0, vX = 0, vY = 0;
-let isGrounded = false;
-let blocks = [];
-const config = { gravity: 0.8, speed: 6, jump: -16, tileSize: 40 };
 const keys = {};
+let blocks = [];
+const config = { gravity: 0.8, speed: 6, jump: -15, tileSize: 40 };
+
+// Globale Physik-Variablen
+let pX, pY, vX, vY, isGrounded;
 
 function initMenu() {
     const grid = document.getElementById('level-grid');
     grid.innerHTML = "";
-    levels.forEach((lvl, i) => {
+    levels.forEach((_, i) => {
         const card = document.createElement('div');
-        card.className = `level-card ${i + 1 > unlocked ? 'locked' : ''}`;
+        card.className = `level-card ${i + 1 > unlocked ? 'locked' : 'unlocked'}`;
         card.innerText = i + 1;
-        card.onclick = () => { if(i + 1 <= unlocked) startLevel(i); };
+        card.onclick = () => { if(i + 1 <= unlocked) startLevel(i, true); };
         grid.appendChild(card);
     });
 }
 
-async function startLevel(index) {
+async function startLevel(index, isNewLevel = false) {
+    if (animationId) cancelAnimationFrame(animationId);
     currentLvlIndex = index;
-    const levelData = await import(`./level/${levels[index]}.js`);
-    const layout = levelData.layout;
     
-    // Reset
+    if (isNewLevel) {
+        playerLives = 3;
+        activeCheckpoint = null;
+        coins = 0;
+    }
+
+    updateUI();
+    const levelData = await import(`./level/${levels[index]}.js`);
     world.innerHTML = '<div id="player"></div>';
     blocks = [];
-    vX = 0; vY = 0;
-    document.getElementById('level-display').innerText = `Level ${index + 1}`;
 
-    // Map bauen
-    layout.forEach((row, y) => {
+    levelData.layout.forEach((row, y) => {
         row.split('').forEach((char, x) => {
-            let bX = x * config.tileSize;
-            let bY = y * config.tileSize;
-
-            if (char === 'S') { // Spawn
-                pX = bX; pY = bY;
-            } else if (char === '#' || char === '-' || char === 'F') {
+            const bX = x * config.tileSize;
+            const bY = y * config.tileSize;
+            if (char === 'S') spawnPoint = { x: bX, y: bY };
+            else if (char !== ' ') {
                 const el = document.createElement('div');
-                el.className = 'block' + (char === '-' ? ' platform' : char === 'F' ? ' flag' : '');
-                el.style.left = bX + "px";
-                el.style.top = bY + "px";
+                el.style.left = bX + "px"; el.style.top = bY + "px";
+                if (char === '#') el.className = 'block';
+                if (char === 'C') el.className = 'coin';
+                if (char === 'F') el.className = 'block flag';
+                if (char === 'P') el.className = 'checkpoint';
                 world.appendChild(el);
-                blocks.push({ x: bX, y: bY, w: config.tileSize, h: config.tileSize, type: char });
+                blocks.push({ x: bX, y: bY, w: 40, h: 40, type: char, el: el });
             }
         });
     });
 
+    let start = activeCheckpoint || spawnPoint;
+    pX = start.x; pY = start.y;
+    vX = 0; vY = 0; isGrounded = false;
+
     menuContainer.classList.add('hidden');
     gameScreen.classList.remove('hidden');
-    requestAnimationFrame(update);
+    loop();
 }
 
-function update() {
-    if (gameScreen.classList.contains('hidden')) return;
-
-    // Input
+function loop() {
     if (keys['ArrowRight'] || keys['btn-right'] || keys['d']) vX = config.speed;
     else if (keys['ArrowLeft'] || keys['btn-left'] || keys['a']) vX = -config.speed;
     else vX = 0;
 
-    if ((keys['ArrowUp'] || keys['btn-jump'] || keys['w'] || keys[' ']) && isGrounded) {
-        vY = config.jump;
-        isGrounded = false;
-    }
+    if ((keys['ArrowUp'] || keys['btn-jump'] || keys['w'] || keys[' ']) && isGrounded) { vY = config.jump; isGrounded = false; }
 
-    vY += config.gravity;
-    pX += vX;
-    pY += vY;
-
-    // Kollisions-Logik
+    vY += config.gravity; pX += vX; pY += vY;
     isGrounded = false;
-    for (let b of blocks) {
+
+    for (let i = blocks.length - 1; i >= 0; i--) {
+        let b = blocks[i];
         if (pX < b.x + b.w && pX + 32 > b.x && pY < b.y + b.h && pY + 38 > b.y) {
+            if (b.type === 'C') { 
+                coins++; updateUI(); b.el.remove(); blocks.splice(i, 1); continue; 
+            }
             if (b.type === 'F') { win(); return; }
-            
-            // Kollision von oben
-            if (vY > 0 && pY + 20 < b.y) {
-                pY = b.y - 38;
-                vY = 0;
-                isGrounded = true;
-            } 
-            // Kollision von unten
-            else if (vY < 0 && pY > b.y + 10) {
-                pY = b.y + b.h;
-                vY = 0;
+            if (b.type === 'P') {
+                if (!activeCheckpoint || activeCheckpoint.x !== b.x) {
+                    activeCheckpoint = { x: b.x, y: b.y }; b.el.classList.add('active');
+                }
+                continue;
             }
-            // Seitliche Wand
-            else {
-                pX -= vX;
-            }
+            if (vY > 0 && pY + 20 < b.y) { pY = b.y - 38; vY = 0; isGrounded = true; }
+            else if (vY < 0 && pY > b.y + 10) { pY = b.y + b.h; vY = 0; }
+            else { pX -= vX; }
         }
     }
 
-    // Player & Kamera positionieren
-    const playerEl = document.getElementById('player');
-    playerEl.style.left = pX + "px";
-    playerEl.style.top = pY + "px";
+    const p = document.getElementById('player');
+    p.style.left = pX + "px"; p.style.top = pY + "px";
+    world.style.transform = `translateX(${-pX + window.innerWidth/2}px)`;
 
-    // Kamera folgt Spieler (horizontal)
-    let scrollX = -(pX - window.innerWidth / 2);
-    world.style.transform = `translateX(${scrollX}px)`;
+    if (pY > 1200) { die(); return; }
+    animationId = requestAnimationFrame(loop);
+}
 
-    if (pY > window.innerHeight + 500) restart(); // Runtergefallen
-    
-    requestAnimationFrame(update);
+function die() {
+    playerLives--;
+    if (playerLives <= 0) exitToMenu();
+    else startLevel(currentLvlIndex, false);
 }
 
 function win() {
+    cancelAnimationFrame(animationId);
     unlocked = Math.max(unlocked, currentLvlIndex + 2);
     localStorage.setItem('jumper_unlocked', unlocked);
-    if (currentLvlIndex + 1 < levels.length) startLevel(currentLvlIndex + 1);
-    else exitToMenu();
+    if (currentLvlIndex + 1 < levels.length) startLevel(currentLvlIndex + 1, true);
+    else document.getElementById('win-screen').classList.remove('hidden');
 }
 
-function restart() {
-    vX = 0; vY = 0;
-    startLevel(currentLvlIndex);
+function updateUI() {
+    const container = document.getElementById('lives-container');
+    container.innerHTML = "";
+    for(let i=0; i<playerLives; i++) {
+        const h = document.createElement('div'); h.className = 'heart'; container.appendChild(h);
+    }
+    document.getElementById('coin-count').innerText = coins;
 }
 
 window.exitToMenu = () => {
+    cancelAnimationFrame(animationId);
     gameScreen.classList.add('hidden');
     menuContainer.classList.remove('hidden');
     initMenu();
 };
 
-// Controls
 const handler = (k, v) => keys[k] = v;
 window.onkeydown = (e) => handler(e.key, true);
 window.onkeyup = (e) => handler(e.key, false);
-
 ['btn-left', 'btn-right', 'btn-jump'].forEach(id => {
     const el = document.getElementById(id);
     el.onpointerdown = (e) => { e.preventDefault(); handler(id, true); };
