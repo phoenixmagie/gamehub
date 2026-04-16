@@ -1,16 +1,19 @@
 import { levels } from './level/levels.js';
 
 let currentLvlIndex = 0;
-let world = document.getElementById('world');
-let player = document.getElementById('player');
 let unlocked = parseInt(localStorage.getItem('jumper_unlocked')) || 1;
 
-// Physik Variablen
-let pX = 50, pY = 0, vX = 0, vY = 0;
+const world = document.getElementById('world');
+const player = document.getElementById('player');
+const gameScreen = document.getElementById('game-screen');
+const menuContainer = document.getElementById('menu-container');
+
+// Physik-Setup
+let pX = 0, pY = 0, vX = 0, vY = 0;
 let isGrounded = false;
-const gravity = 0.8, speed = 5, jumpPower = -15;
 let blocks = [];
-let keys = {};
+const config = { gravity: 0.8, speed: 6, jump: -16, tileSize: 40 };
+const keys = {};
 
 function initMenu() {
     const grid = document.getElementById('level-grid');
@@ -29,79 +32,89 @@ async function startLevel(index) {
     const levelData = await import(`./level/${levels[index]}.js`);
     const layout = levelData.layout;
     
-    // Spielfeld leeren
+    // Reset
     world.innerHTML = '<div id="player"></div>';
-    player = document.getElementById('player');
     blocks = [];
-    pX = 50; pY = 100; vX = 0; vY = 0;
+    vX = 0; vY = 0;
+    document.getElementById('level-display').innerText = `Level ${index + 1}`;
 
-    // Level aufbauen
+    // Map bauen
     layout.forEach((row, y) => {
         row.split('').forEach((char, x) => {
-            if (char === '#' || char === '-' || char === 'F') {
-                const b = document.createElement('div');
-                b.className = char === '#' ? 'block' : char === '-' ? 'block platform' : 'block flag';
-                b.style.left = x * 40 + "px";
-                b.style.top = y * 40 + "px";
-                world.appendChild(b);
-                blocks.push({ x: x * 40, y: y * 40, type: char });
+            let bX = x * config.tileSize;
+            let bY = y * config.tileSize;
+
+            if (char === 'S') { // Spawn
+                pX = bX; pY = bY;
+            } else if (char === '#' || char === '-' || char === 'F') {
+                const el = document.createElement('div');
+                el.className = 'block' + (char === '-' ? ' platform' : char === 'F' ? ' flag' : '');
+                el.style.left = bX + "px";
+                el.style.top = bY + "px";
+                world.appendChild(el);
+                blocks.push({ x: bX, y: bY, w: config.tileSize, h: config.tileSize, type: char });
             }
         });
     });
 
-    document.getElementById('game-screen').classList.remove('hidden');
-    document.getElementById('menu-container').classList.add('hidden');
-    gameLoop();
+    menuContainer.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    requestAnimationFrame(update);
 }
 
-function gameLoop() {
-    if (document.getElementById('game-screen').classList.contains('hidden')) return;
+function update() {
+    if (gameScreen.classList.contains('hidden')) return;
 
-    // Steuerung
-    if (keys['ArrowRight'] || keys['btn-right']) vX = speed;
-    else if (keys['ArrowLeft'] || keys['btn-left']) vX = -speed;
+    // Input
+    if (keys['ArrowRight'] || keys['btn-right'] || keys['d']) vX = config.speed;
+    else if (keys['ArrowLeft'] || keys['btn-left'] || keys['a']) vX = -config.speed;
     else vX = 0;
 
-    if ((keys['ArrowUp'] || keys['btn-jump'] || keys[' ']) && isGrounded) {
-        vY = jumpPower;
+    if ((keys['ArrowUp'] || keys['btn-jump'] || keys['w'] || keys[' ']) && isGrounded) {
+        vY = config.jump;
         isGrounded = false;
     }
 
-    // Gravitation
-    vY += gravity;
+    vY += config.gravity;
     pX += vX;
     pY += vY;
 
-    // Kollision & Kamera
-    checkCollision();
-    
-    player.style.left = pX + "px";
-    player.style.top = pY + "px";
-
-    // Kamera folgt Spieler (Zentriert)
-    let camX = -(pX - window.innerWidth / 2);
-    world.style.transform = `translateX(${camX}px)`;
-
-    requestAnimationFrame(gameLoop);
-}
-
-function checkCollision() {
+    // Kollisions-Logik
     isGrounded = false;
-    blocks.forEach(b => {
-        // Einfache Box-Kollision
-        if (pX < b.x + 40 && pX + 34 > b.x && pY < b.y + 40 && pY + 38 > b.y) {
-            if (b.type === 'F') { // Ziel erreicht
-                win();
-            } else if (vY > 0 && pY + 30 < b.y) { // Von oben gelandet
+    for (let b of blocks) {
+        if (pX < b.x + b.w && pX + 32 > b.x && pY < b.y + b.h && pY + 38 > b.y) {
+            if (b.type === 'F') { win(); return; }
+            
+            // Kollision von oben
+            if (vY > 0 && pY + 20 < b.y) {
                 pY = b.y - 38;
                 vY = 0;
                 isGrounded = true;
-            } else {
-                pX -= vX; // Seitlich gegen Wand
+            } 
+            // Kollision von unten
+            else if (vY < 0 && pY > b.y + 10) {
+                pY = b.y + b.h;
+                vY = 0;
+            }
+            // Seitliche Wand
+            else {
+                pX -= vX;
             }
         }
-    });
-    if (pY > 1000) restartLevel(); // In Abgrund gefallen
+    }
+
+    // Player & Kamera positionieren
+    const playerEl = document.getElementById('player');
+    playerEl.style.left = pX + "px";
+    playerEl.style.top = pY + "px";
+
+    // Kamera folgt Spieler (horizontal)
+    let scrollX = -(pX - window.innerWidth / 2);
+    world.style.transform = `translateX(${scrollX}px)`;
+
+    if (pY > window.innerHeight + 500) restart(); // Runtergefallen
+    
+    requestAnimationFrame(update);
 }
 
 function win() {
@@ -111,25 +124,26 @@ function win() {
     else exitToMenu();
 }
 
-// Global für Buttons
+function restart() {
+    vX = 0; vY = 0;
+    startLevel(currentLvlIndex);
+}
+
 window.exitToMenu = () => {
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('menu-container').classList.remove('hidden');
+    gameScreen.classList.add('hidden');
+    menuContainer.classList.remove('hidden');
     initMenu();
 };
 
-window.restartLevel = () => startLevel(currentLvlIndex);
+// Controls
+const handler = (k, v) => keys[k] = v;
+window.onkeydown = (e) => handler(e.key, true);
+window.onkeyup = (e) => handler(e.key, false);
 
-// Input Listener
-const setKey = (k, v) => keys[k] = v;
-window.onkeydown = (e) => setKey(e.key, true);
-window.onkeyup = (e) => setKey(e.key, false);
-
-// Touch Buttons
 ['btn-left', 'btn-right', 'btn-jump'].forEach(id => {
-    const btn = document.getElementById(id);
-    btn.onpointerdown = () => setKey(id, true);
-    btn.onpointerup = () => setKey(id, false);
+    const el = document.getElementById(id);
+    el.onpointerdown = (e) => { e.preventDefault(); handler(id, true); };
+    el.onpointerup = (e) => { e.preventDefault(); handler(id, false); };
 });
 
 initMenu();
