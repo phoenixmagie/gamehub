@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Retro Jump 'n' Run</title>
+    <title>Retro Adventure</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,14 +16,15 @@
 
     <div id="game-screen" class="hidden">
         <div id="world-container">
-            <div id="world">
-                <div id="player"></div>
-            </div>
+            <div id="world"><div id="player"></div></div>
         </div>
         
         <div id="ui">
+            <div class="ui-row">
+                <div id="lives-container"></div>
+                <div id="coin-info">🪙 <span id="coin-count">0</span></div>
+            </div>
             <button class="ui-btn" onclick="exitToMenu()">MENÜ</button>
-            <span id="level-display">Level 1</span>
         </div>
 
         <div id="controls">
@@ -32,6 +33,14 @@
                 <button id="btn-right">▶</button>
             </div>
             <button id="btn-jump">JUMP</button>
+        </div>
+    </div>
+
+    <div id="win-screen" class="hidden">
+        <div class="win-content">
+            <h1>GEWONNEN!</h1>
+            <p>Du hast alle Welten gerettet.</p>
+            <button class="ui-btn" onclick="location.reload()">ZUM START</button>
         </div>
     </div>
 
