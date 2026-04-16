@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jump 'n' Run Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="menu-container">
+        <h1>LEVEL AUSWAHL</h1>
+        <div id="level-grid"></div>
+        <hr>
+        <a href="../../index.html" class="hub-btn">ZURÜCK ZUM HUB</a>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="world">
+            <div id="player"></div>
+        </div>
+        
+        <div id="ui">
+            <button class="ui-btn" onclick="exitToMenu()">MENU</button>
+            <div id="level-name">Level 1</div>
+        </div>
+
+        <div id="controls">
+            <div class="left-group">
+                <button id="btn-left">◀</button>
+                <button id="btn-right">▶</button>
+            </div>
+            <button id="btn-jump">JUMP</button>
+        </div>
+    </div>
+
+    <script type="module" src="game.js"></script>
+</body>
+</html>
