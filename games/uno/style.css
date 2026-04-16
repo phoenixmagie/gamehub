@@ -41,7 +41,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* Karten-Styling */
 .card {
     width: 70px;
     height: 105px;
@@ -50,61 +49,29 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-    transition: transform 0.2s, margin 0.2s;
+    transition: transform 0.2s;
 }
 
 .card:hover { transform: translateY(-15px); z-index: 10; }
-
 .card.red { background-color: var(--red); }
 .card.blue { background-color: var(--blue); }
 .card.green { background-color: var(--green); }
 .card.yellow { background-color: var(--yellow); }
+.card.black { background-color: #000; color: #fff; border-color: #f1c40f; }
+.card.back { background: linear-gradient(45deg, #000, #444); color: var(--red); border-color: #7f8c8d; }
 
-.card.back {
-    background: linear-gradient(45deg, #000, #444);
-    color: var(--red);
-    border-color: #7f8c8d;
-}
-
-/* Tischmitte */
-#center-deck {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
-}
-
+#center-deck { display: flex; justify-content: center; align-items: center; gap: 40px; }
 #draw-pile, .card-back {
-    width: 70px;
-    height: 105px;
-    background: #000;
-    border: 3px solid white;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    width: 70px; height: 105px; background: #000; border: 3px solid white; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
 }
-
 #status-box { text-align: center; width: 300px; }
-
-.menu-btn, #next-player-btn {
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    margin: 5px;
-}
-
+.menu-btn, #next-player-btn { padding: 10px 20px; font-weight: bold; cursor: pointer; border: none; border-radius: 5px; margin: 5px; }
 .menu-btn { background: var(--blue); color: white; }
 #next-player-btn { background: var(--green); color: white; padding: 20px; }
-
 .hidden { display: none !important; }
-.label { font-size: 0.8rem; opacity: 0.5; margin-bottom: 5px; }
+.label { font-size: 0.8rem; opacity: 0.5; margin-bottom: 5px; text-align: center;}
