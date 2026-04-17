@@ -2,40 +2,56 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Jumper Level Editor + Import</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Retro Adventure</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="toolbar">
-        <div class="tool active" data-type="S">S (Start)</div>
-        <div class="tool" data-type="#"># (Block)</div>
-        <div class="tool" data-type="-">- (Plattform)</div>
-        <div class="tool" data-type="C">C (Coin)</div>
-        <div class="tool" data-type="E">E (Gegner)</div>
-        <div class="tool" data-type="X">X (Wende)</div>
-        <div class="tool" data-type="P">P (Checkpoint)</div>
-        <div class="tool" data-type="F">F (Flagge)</div>
-        <div class="tool" data-type=" ">LÖSCHEN</div>
-        <button id="import-btn" style="background: #3498db; color: white;">LEVEL LADEN</button>
-        <button id="export-btn" style="background: #2ecc71; color: white;">CODE GENERIEREN</button>
+    <div id="menu-container">
+        <h1>LEVEL AUSWAHL</h1>
+        <div id="level-grid"></div>
+        
+        <div id="editor-link-container" style="margin-top: 20px;">
+            <a href="editor.html" class="ui-btn" style="text-decoration: none; background: #e74c3c; color: white; display: inline-block;">🛠 LEVEL EDITOR</a>
+        </div>
+
+        <hr style="width: 80%; margin: 30px 0;">
+        <a href="../../index.html" class="hub-btn">ZURÜCK ZUM HUB</a>
     </div>
 
-    <div id="editor-container">
-        <div id="grid"></div>
-    </div>
-
-    <div id="modal" class="hidden">
-        <div class="modal-content">
-            <h3 id="modal-title">Level-Code</h3>
-            <p id="modal-desc">Hier den Code einfügen oder kopieren:</p>
-            <textarea id="io-text"></textarea>
-            <div id="modal-actions">
-                <button id="confirm-import-btn" class="hidden">IMPORTIEREN</button>
-                <button onclick="closeModal()">SCHLIEẞEN</button>
+    <div id="game-screen" class="hidden">
+        <div id="world-container">
+            <div id="world"><div id="player"></div></div>
+        </div>
+        
+        <div id="ui">
+            <div class="ui-row">
+                <div id="lives-container"></div>
+                <div id="coin-info">🪙 <span id="coin-count">0</span></div>
             </div>
+            <div class="ui-row">
+                <button class="ui-btn" onclick="exitToMenu()">MENÜ</button>
+                <span id="level-display">Level 1</span>
+            </div>
+        </div>
+
+        <div id="controls">
+            <div class="move-group">
+                <button id="btn-left">◀</button>
+                <button id="btn-right">▶</button>
+            </div>
+            <button id="btn-jump">JUMP</button>
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <div id="win-screen" class="hidden">
+        <div class="win-content">
+            <h1>GEWONNEN!</h1>
+            <p>Du hast alle Welten gerettet.</p>
+            <button class="ui-btn" onclick="location.reload()">ZUM START</button>
+        </div>
+    </div>
+
+    <script type="module" src="game.js"></script>
 </body>
 </html>
