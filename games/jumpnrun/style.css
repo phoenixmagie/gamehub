@@ -1,15 +1,46 @@
-:root { --sky: #5c94fc; --brick: #ab5233; --platform: #edb468; }
+:root { 
+    --sky: #5c94fc; 
+    --brick: #ab5233; 
+    --platform: #edb468; 
+}
+
 * { box-sizing: border-box; touch-action: none; user-select: none; }
-body { margin: 0; background: #000; font-family: 'Arial Black', sans-serif; overflow: hidden; color: white; }
+
+body { 
+    margin: 0; 
+    background: #000; 
+    font-family: 'Arial Black', sans-serif; 
+    overflow: hidden; 
+    color: white; 
+}
 
 /* MENÜ */
-#menu-container { background: var(--sky); height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px; }
-#level-grid { display: grid; grid-template-columns: repeat(auto-fit, 80px); gap: 20px; justify-content: center; width: 100%; max-width: 600px; margin: 40px auto; }
+#menu-container { 
+    background: var(--sky); 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    padding: 40px; 
+}
+
+#level-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, 80px); 
+    gap: 20px; 
+    justify-content: center; 
+    width: 100%; 
+    max-width: 600px; 
+    margin: 40px auto; 
+}
+
 .level-card { 
     width: 80px; height: 80px; border: 4px solid #000; background: #fff; cursor: pointer;
     display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #000;
 }
+
 .level-card.locked { background: #444; opacity: 0.5; cursor: not-allowed; color: #888; }
+
 .hub-btn { color: white; text-decoration: none; margin-top: 20px; border-bottom: 2px solid #fff; }
 
 /* CSS HERZEN */
@@ -54,3 +85,39 @@ body { margin: 0; background: #000; font-family: 'Arial Black', sans-serif; over
 #win-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .win-content { text-align: center; }
 .hidden { display: none !important; }
+
+/* 🛠 EDITOR SPEZIFISCHE ERGÄNZUNGEN */
+#editor-ui { 
+    background: #1a1a1a; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; 
+    position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid #000; 
+}
+
+#editor-container { 
+    padding: 40px; background: var(--sky); min-height: 100vh; overflow: auto; 
+}
+
+#grid { 
+    display: grid; background: rgba(255,255,255,0.1); width: fit-content; 
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+.cell { 
+    width: 40px; height: 40px; border: 1px solid rgba(0,0,0,0.05); 
+    display: flex; align-items: center; justify-content: center; position: relative;
+}
+
+.cell .coin, .cell .block, .cell .enemy, .cell .checkpoint, .cell .player {
+    position: relative; inset: auto; /* Hebt die absolute Positionierung im Editor-Grid auf */
+}
+
+.tool.active { outline: 4px solid #fff; transform: scale(1.1); z-index: 10; }
+
+#io-modal { 
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
+    display: flex; align-items: center; justify-content: center; z-index: 2000; 
+}
+
+#io-modal textarea { 
+    width: 100%; height: 250px; background: #000; color: #0f0; 
+    font-family: monospace; padding: 10px; margin: 15px 0; border: 2px solid #555;
+}
