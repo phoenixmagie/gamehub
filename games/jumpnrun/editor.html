@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Adventure - Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="overflow: auto;">
+    <div id="editor-ui">
+        <button class="tool ui-btn active" data-type="S">S</button>
+        <button class="tool ui-btn" data-type="#">#</button>
+        <button class="tool ui-btn" data-type="-">-</button>
+        <button class="tool ui-btn" data-type="C">C</button>
+        <button class="tool ui-btn" data-type="E">E</button>
+        <button class="tool ui-btn" data-type="X">X</button>
+        <button class="tool ui-btn" data-type="P">P</button>
+        <button class="tool ui-btn" data-type="F">F</button>
+        <button class="tool ui-btn" data-type=" " style="background:#888">DEL</button>
+        
+        <div style="flex-grow: 1;"></div>
+        
+        <button class="ui-btn" onclick="openIO('import')">LADEN</button>
+        <button class="ui-btn" onclick="openIO('export')">CODE</button>
+        <a href="index.html" class="ui-btn" style="text-decoration:none">ZURÜCK</a>
+    </div>
+
+    <div id="editor-container">
+        <div id="grid"></div>
+    </div>
+
+    <div id="io-modal" class="hidden">
+        <div class="win-content" style="background: #222; padding: 30px; border: 4px solid #fff;">
+            <h2 id="modal-title">Level Code</h2>
+            <textarea id="io-area"></textarea>
+            <div style="display:flex; gap:10px; justify-content:center">
+                <button id="modal-confirm" class="ui-btn">IMPORTIEREN</button>
+                <button onclick="closeModal()" class="ui-btn">SCHLIESSEN</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+</html>
