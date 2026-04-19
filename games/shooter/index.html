@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile FPS Three.js</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@latest/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@latest/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="ui">
+        <div id="crosshair">+</div>
+        <div id="msg">Klicke zum Starten</div>
+    </div>
+
+    <div id="mobile-overlay">
+        <div id="joystick-area">Bewegen</div>
+        <div id="look-area">Umsehen & Schießen</div>
+    </div>
+
+    <script type="module" src="game.js"></script>
+</body>
+</html>
