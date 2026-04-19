@@ -1,32 +1,97 @@
-body { margin: 0; overflow: hidden; background: #000; touch-action: none; }
-canvas { display: block; }
+/* Globale Einstellungen, damit alles Vollbild ist */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Verhindert Scrollen */
+    background-color: #000;
+    touch-action: none; /* Wichtig für flüssiges Touch-Feedback */
+    font-family: sans-serif;
+}
 
+/* Der 3D-Canvas (das Spiel) soll im Hintergrund liegen */
+canvas {
+    display: block;
+    position: fixed; /* Liegt fixiert im Hintergrund */
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1; /* Niedrigster z-index */
+}
+
+/* Das UI-System (Text, Fadenkreuz) liegt darüber */
 #ui {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; justify-content: center; align-items: center;
-    pointer-events: none; color: white; font-family: sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* SUPER WICHTIG: Klicks gehen HIER DURCH zum Spiel */
+    z-index: 10; /* Höher als der Canvas */
 }
 
-#crosshair { font-size: 2rem; opacity: 0.7; }
+/* Fadenkreuz stylen */
+#crosshair {
+    font-size: 2rem;
+    color: white;
+    opacity: 0.7;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Bessere Lesbarkeit auf hellem Grund */
+}
 
+/* Start-Meldung stylen */
 #msg {
-    position: absolute; bottom: 20%;
-    background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 5px;
+    position: absolute;
+    bottom: 20%;
+    background: rgba(0,0,0,0.8); /* Dunkler, damit man es sieht */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
 }
 
+/* --- MOBILE STEUERUNG (wird nur per JS auf Mobilgeräten aktiv) --- */
 #mobile-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: none; /* Wird per JS aktiviert */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none; /* Standardmäßig aus */
+    z-index: 5; /* Zwischen Canvas und UI */
 }
 
+/* Linke Hälfte zum Laufen */
 #joystick-area {
-    position: absolute; left: 0; bottom: 0; width: 40%; height: 50%;
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center; color: white;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40%;
+    height: 50%;
+    /* Hintergrund entfernen, damit man das Spiel sieht! */
+    background: rgba(255,255,255,0.05); /* Nur ein HAUCH von Weiß, damit man weiß, wo man drücken muss */
+    border-right: 1px solid rgba(255,255,255,0.1); /* Eine kleine Trennlinie */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5); /* Heller Text, stört nicht */
+    font-size: 0.9rem;
 }
 
+/* Rechte Hälfte zum Umsehen & Schießen */
 #look-area {
-    position: absolute; right: 0; bottom: 0; width: 60%; height: 100%;
-    display: flex; align-items: center; justify-content: center; color: white;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 60%;
+    height: 100%;
+    /* Rechter Bereich ist unsichtbar, Klicks werden per JS verarbeitet */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.5); /* Heller Text, stört nicht */
+    font-size: 0.9rem;
 }
